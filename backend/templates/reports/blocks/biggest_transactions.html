@@ -1,0 +1,14 @@
+<section class="keep">
+  <h2>Biggest transactions</h2>
+  {% if d.rows is none %}
+  <p class="muted">Transaction-level details are hidden for sharing.</p>
+  {% elif d.rows %}
+  <table class="tight">
+    <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="num">Amount</th></tr></thead>
+    <tbody>{% for r in d.rows %}<tr><td>{{ r.date }}</td><td>{{ r.category }}</td><td>{{ r.description }}</td><td class="num">{{ r.amount|inr }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% else %}
+  <p class="muted">No discretionary expenses this month.</p>
+  {% endif %}
+  <p class="small muted" style="margin-top:1mm">Top 5 expenses, excluding fixed items ({{ d.excluded_categories|join(", ") }}).</p>
+</section>

@@ -1,0 +1,30 @@
+<section>
+  <h2>Income by source</h2>
+  <div class="cols">
+    <div class="keep" style="flex:0 0 62mm">
+      <table>
+        <thead><tr><th>Source</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+        {% for s in d.sources %}<tr><td>{{ s.source }}</td><td class="num">{{ s.amount|inr }}</td></tr>{% endfor %}
+        <tr class="total"><td>Total income</td><td class="num">{{ d.total|inr }}</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted" style="margin-top:2mm">{{ d.method }}</p>
+    </div>
+    <div>
+      <table class="tight">
+        <thead><tr><th>Month</th><th class="num">Salary</th><th class="num">Bonuses</th><th class="num">Consulting</th><th class="num">Total</th></tr></thead>
+        <tbody>
+        {% for m in d.months %}<tr><td>{{ m.month }}</td><td class="num">{{ m.Salary|inr }}</td><td class="num">{{ m.Bonuses|inr if m.Bonuses else "–" }}</td><td class="num">{{ m.Consulting|inr }}</td><td class="num">{{ m.total|inr }}</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% if d.bonus_credits %}
+  <h3 style="margin-top:3mm">Bonus credits detected</h3>
+  <table class="tight keep">
+    <thead><tr><th>Date</th><th>txn_id</th><th class="num">Credited</th><th class="num">Base salary</th><th class="num">Bonus</th></tr></thead>
+    <tbody>{% for b in d.bonus_credits %}<tr><td>{{ b.date }}</td><td>{{ b.txn_id }}</td><td class="num">{{ b.credited|inr }}</td><td class="num">{{ b.base_salary|inr }}</td><td class="num">{{ b.bonus|inr }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+</section>

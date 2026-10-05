@@ -604,9 +604,10 @@ def forecast(months: int = 12) -> dict:
 # ---------------------------------------------------------------- raw query
 def search_transactions(period: str = "all", categories=None, description_contains: str | None = None,
                         min_amount: float | None = None, max_amount: float | None = None, txn_type: str | None = None,
-                        sort_by: str = "amount_desc", limit: int = 15, include_excluded: bool = False) -> dict:
+                        sort_by: str = "amount_desc", limit: int = 15, include_excluded: bool = False,
+                        exclude_categories=None) -> dict:
     df, a, b, label = _slice(period, include_excluded=include_excluded)
-    df = _apply_filters(df, categories, min_amount=min_amount, max_amount=max_amount)
+    df = _apply_filters(df, categories, exclude_categories, min_amount=min_amount, max_amount=max_amount)
     if description_contains:
         df = df[df["description"].str.contains(description_contains, case=False, na=False)]
     if txn_type in ("income", "expense"):
@@ -617,18 +618,192 @@ def search_transactions(period: str = "all", categories=None, description_contai
     limit = int(max(1, min(limit, 100)))
     rows = [{"txn_id": r["txn_id"], "date": str(r["date"].date()), "category": r["category"],
              "description": r["description"], "amount": _r(r["amount"], 2), "type": r["type"],
-             "flags": ", ".join(r["flags"])} for _, r in df.head(limit).iterrows()]
+             "original_txn_id": r["original_txn_id"], "flags": ", ".join(r["flags"])}
+            for _, r in df.head(limit).iterrows()]
     return {"period": label, "matches": int(len(df)), "total_amount": _r(df["amount"].sum()), "rows": rows}
 
 
-def get_data_quality_report() -> dict:
+def _raw_month_range(period: str | None, ds: Dataset):
+    """Like _slice's range, but bounded by every row (incl. quarantined ones) so out-of-window rows still match."""
+    months = ds.transactions["month"].dropna()
+    return resolve_period(period, months.min(), months.max())
+
+
+def get_data_quality_report(period: str | None = None) -> dict:
+    """Cleaning log. With `period`, only issues whose affected row falls in that period (with row details)."""
     ds = _ds()
-    issues = ds.issues
-    by_sev = pd.Series([i["severity"] for i in issues]).value_counts().to_dict()
+    rows = ds.transactions.set_index("txn_id")
+    issues = []
+    for issue in ds.issues:
+        row = rows.loc[issue["row_id"]] if issue["row_id"] in rows.index else None
+        if isinstance(row, pd.DataFrame):
+            row = row.iloc[0]
+        issues.append({**issue,
+                       "date": str(row["date"].date()) if row is not None and pd.notna(row["date"]) else None,
+                       "month": row["month"] if row is not None else None,
+                       "amount": _r(row["amount"], 2) if row is not None and pd.notna(row["amount"]) else None,
+                       "excluded": bool(row["excluded"]) if row is not None else True})
+    label = None
+    if period:
+        a, b, label = _raw_month_range(period, ds)
+        issues = [i for i in issues if i["month"] is not None and pd.notna(i["month"]) and a <= i["month"] <= b]
+    for i in issues:
+        i.pop("month")
+    by_sev = pd.Series([i["severity"] for i in issues], dtype=object).value_counts().to_dict()
     return {
+        "period": label,
         "rows_after_dedup": int(len(ds.transactions)),
         "rows_used_in_metrics": int(len(ds.txns)),
         "rows_excluded": int(ds.transactions["excluded"].sum()),
         "issues_found": len(issues), "by_severity": by_sev, "issues": issues,
         "coverage": f"{ds.window_start.strftime('%b %Y')} – {(ds.window_end - pd.Timedelta(days=1)).strftime('%b %Y')}",
     }
+
+
+def get_report_transactions(period: str, include_excluded: bool = False) -> list[dict]:
+    """Return transaction-level records for deterministic report section builders."""
+    df, _, _, _ = _slice(period, include_excluded=include_excluded)
+    return [
+        {
+            "txn_id": str(row["txn_id"]),
+            "original_txn_id": str(row["original_txn_id"]),
+            "date": str(row["date"].date()) if pd.notna(row["date"]) else None,
+            "category": str(row["category"]),
+            "description": str(row["description"]),
+            "amount": float(row["amount"]) if pd.notna(row["amount"]) else None,
+            "type": str(row["type"]),
+            "kind": str(row["kind"]),
+            "excluded": bool(row["excluded"]),
+            "flags": list(row["flags"]),
+        }
+        for _, row in df.iterrows()
+    ]
+
+
+# ---------------------------------------------------------------- report analytics
+# A salary credit this far above the fitted base-salary trend is treated as base + bonus.
+BONUS_THRESHOLD = 0.25
+INCOME_SOURCES = ("Salary", "Bonuses", "Consulting", "Other")
+
+
+def _salary_split(ds: Dataset) -> dict[str, tuple[float, float]]:
+    """txn_id -> (base salary, bonus) for every clean salary credit.
+
+    Base pay rises steadily, so a flat median would misread raises as bonuses. Fit a linear trend,
+    refit without the credits far above it, then split each credit into trend (base) + excess (bonus).
+    """
+    sal = ds.txns[(ds.txns["category"] == "Salary") & (ds.txns["type"] == "income")]
+    if len(sal) < 3:
+        return {t: (a, 0.0) for t, a in zip(sal["txn_id"], sal["amount"])}
+    x = (sal["date"].dt.year * 12 + sal["date"].dt.month).to_numpy(dtype=float)
+    y = sal["amount"].to_numpy(dtype=float)
+    keep = np.ones(len(y), dtype=bool)
+    for _ in range(3):
+        slope, intercept = np.polyfit(x[keep], y[keep], 1)
+        trend = slope * x + intercept
+        keep = y <= trend * (1 + BONUS_THRESHOLD / 2)
+    out = {}
+    for t, amount, base in zip(sal["txn_id"], y, np.round(trend)):
+        out[t] = (base, amount - base) if amount > base * (1 + BONUS_THRESHOLD) else (amount, 0.0)
+    return out
+
+
+def _income_source(row, split) -> list[tuple[str, float]]:
+    if row["txn_id"] in split:
+        base, bonus = split[row["txn_id"]]
+        return [("Salary", base), ("Bonuses", bonus)] if bonus else [("Salary", base)]
+    if "consult" in row["description"].lower():
+        return [("Consulting", row["amount"])]
+    return [("Other", row["amount"])]
+
+
+def get_income_by_source(period: str = "FY2025-26") -> dict:
+    """Income split into salary, bonuses (salary credits far above the base-pay trend), consulting and other."""
+    ds = _ds()
+    df, a, b, label = _slice(period, ds)
+    split = _salary_split(ds)
+    monthly = {m: dict.fromkeys(INCOME_SOURCES, 0.0) for m in _months(a, b)}
+    bonuses = []
+    for _, r in df[df["kind"] == "income"].iterrows():
+        for source, amount in _income_source(r, split):
+            monthly[r["month"]][source] += amount
+        if split.get(r["txn_id"], (0, 0))[1]:
+            base, bonus = split[r["txn_id"]]
+            bonuses.append({"txn_id": r["original_txn_id"], "date": str(r["date"].date()), "credited": _r(r["amount"]),
+                            "base_salary": _r(base), "bonus": _r(bonus)})
+    totals = {s: sum(m[s] for m in monthly.values()) for s in INCOME_SOURCES}
+    return {
+        "period": label,
+        "sources": [{"source": s, "amount": _r(totals[s])} for s in INCOME_SOURCES if totals[s] or s != "Other"],
+        "total": _r(sum(totals.values())),
+        "months": [{"month": m.strftime("%b %Y"), **{s: _r(v[s]) for s in INCOME_SOURCES},
+                    "total": _r(sum(v.values()))} for m, v in monthly.items()],
+        "bonus_credits": bonuses,
+        "method": f"Salary credits more than {BONUS_THRESHOLD:.0%} above the fitted base-salary trend are split into "
+                  "base salary (trend) and bonus (excess).",
+    }
+
+
+# (key, label, matcher, note, related_to)
+TAX_REVIEW_RULES = [
+    ("health_insurance", "Health insurance premiums", lambda r: "health insurance" in r["description"].lower(),
+     "Possible Sec 80D deduction. Confirm the policy covers self/family/parents and the premium was not paid in cash.",
+     None),
+    ("health_checkup", "Preventive health check-ups", lambda r: "health check" in r["description"].lower(),
+     "Related to 80D: preventive check-ups may count within the 80D limit. Confirm with bills.", "health_insurance"),
+    ("home_loan_emi", "Home loan EMIs", lambda r: "home loan emi" in r["description"].lower(),
+     "Interest (Sec 24b) vs principal (80C) split needs the lender's interest certificate.", None),
+    ("investments", "Mutual fund SIPs and equity investments", lambda r: r["category"] == "Investments",
+     "Count under 80C only if the scheme is ELSS. Confirm with the fund statements.", None),
+    ("course_fees", "Course fees", lambda r: "course fee" in r["description"].lower(),
+     "Generally qualifies under 80C only if it is tuition for up to two children. Confirm who the course is for.",
+     None),
+    ("rent_maintenance", "Rent / Home Maintenance", lambda r: "rent / home maintenance" in r["description"].lower(),
+     "Ask: rent (possible HRA/80GG) or maintenance? Relevant because a home loan also exists.", None),
+]
+
+
+def get_tax_review_items(period: str = "FY2025-26") -> dict:
+    """Transactions a CA should look at. Flags only; no tax is calculated."""
+    df, _, _, label = _slice(period)
+    df = df[df["type"] == "expense"]
+    items = []
+    for key, name, match, note, related in TAX_REVIEW_RULES:
+        rows = df[df.apply(match, axis=1)] if len(df) else df
+        items.append({"key": key, "item": name, "total": _r(rows["amount"].sum(), 2), "count": int(len(rows)),
+                      "note": note, "related_to": related,
+                      "transactions": [{"txn_id": r["original_txn_id"], "date": str(r["date"].date()),
+                                        "description": r["description"], "amount": _r(r["amount"], 2)}
+                                       for _, r in rows.iterrows()]})
+    return {"period": label, "items": items}
+
+
+def get_upcoming_payments(days: int = 10) -> dict:
+    """Liability payments due within `days` of the balance-sheet snapshot vs the current-account balance."""
+    ds = _ds()
+    start = ds.as_of.normalize()
+    end = start + pd.Timedelta(days=days)
+    liab = ds.liabilities[(ds.liabilities["due_date"] >= start) & (ds.liabilities["due_date"] <= end)]
+    items = [{"type": r["type"], "id": r["liability_id"], "due": str(r["due_date"].date()), "amount": _r(r["emi"])}
+             for _, r in liab.sort_values("due_date").iterrows()]
+    total = float(liab["emi"].sum())
+    balance = float(ds.assets.loc[ds.assets["type"] == "Current Account", "value"].sum())
+    return {"window": f"{start.date()} to {end.date()}", "items": items, "total_due": _r(total),
+            "current_account_balance": _r(balance), "balance_after_dues": _r(balance - total),
+            "covered": balance >= total}
+
+
+def get_report_periods() -> dict:
+    """Months and financial years a report can be generated for."""
+    ds = _ds()
+    first, last = _bounds(ds)
+    last_complete = last
+    while last_complete.end_time.normalize() >= ds.as_of.normalize():
+        last_complete -= 1
+    fys = []
+    for year in range(first.year - (first.month < 4), last.year + 1):
+        a, b = pd.Period(f"{year}-04", "M"), pd.Period(f"{year + 1}-03", "M")
+        if b >= first and a <= last:
+            fys.append({"fy": f"{year}-{str(year + 1)[2:]}", "partial": a < first or b > last_complete})
+    return {"first_month": str(first), "last_complete_month": str(last_complete), "last_month": str(last),
+            "financial_years": fys}

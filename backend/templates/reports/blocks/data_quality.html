@@ -1,0 +1,18 @@
+<section class="keep">
+  <h2>{% if ctx.report_type == "monthly" %}Data note{% else %}Data-quality note{% endif %}</h2>
+  {% if not d.count %}
+  <p>{{ d.empty_message }}</p>
+  {% elif d.rows %}
+  <p class="small muted">Cleaning decisions affecting {{ d.count }} row(s) in this period. Excluded rows are left out of every figure in this report.</p>
+  <table class="tight">
+    <thead><tr><th>txn_id</th><th>Date</th><th>Issue</th><th>Decision</th><th>Detail</th></tr></thead>
+    <tbody>{% for r in d.rows %}<tr><td>{{ r.txn_id }}</td><td>{{ r.date or "–" }}</td><td>{{ r.issue }}</td><td>{{ r.action }}</td><td>{{ r.detail }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% else %}
+  <p class="small muted">{{ d.count }} row(s) in this period were repaired or excluded. Row details are hidden for sharing.</p>
+  <table class="tight">
+    <thead><tr><th>Issue</th><th class="num">Rows</th><th>Decision</th></tr></thead>
+    <tbody>{% for r in d.summary %}<tr><td>{{ r.issue }}</td><td class="num">{{ r.count }}</td><td>{{ r.action }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+</section>

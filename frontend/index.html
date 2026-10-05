@@ -47,8 +47,43 @@
           <h1>Ask about your money</h1>
           <p class="muted">Every number is computed by the analytics engine; the agent plans the queries and explains the results.</p>
         </div>
-        <button class="ghost" id="newChat">New chat</button>
+        <div class="head-actions">
+          <button class="ghost" id="downloadReport" type="button" aria-expanded="false" aria-controls="reportPanel">Download report</button>
+          <button class="ghost" id="newChat">New chat</button>
+        </div>
       </header>
+      <section class="report-panel" id="reportPanel" aria-label="Download report" hidden>
+        <div class="report-panel-head">
+          <h2>Download report</h2>
+          <button class="icon-btn" id="closeReport" type="button" aria-label="Close report panel">×</button>
+        </div>
+        <label>Report type
+          <select id="reportType">
+            <option value="ca_pack">Tax / CA pack</option>
+            <option value="monthly">Monthly review</option>
+          </select>
+        </label>
+        <div id="caPackFields" class="report-fields">
+          <label>Financial year
+            <select id="reportFy">
+              <option value="2025-26" selected>FY 2025-26</option>
+              <option value="2024-25">FY 2024-25 · partial period</option>
+              <option value="2026-27">FY 2026-27 · partial period</option>
+            </select>
+          </label>
+          <label>Name (optional)<input id="reportName" type="text" autocomplete="name"></label>
+          <label>PAN (optional)<input id="reportPan" type="text" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <div id="monthlyFields" class="report-fields" hidden>
+          <label>Month<input id="reportMonth" type="month" value="2026-09"></label>
+        </div>
+        <label class="report-toggle"><input id="hideDetails" type="checkbox"> Hide transaction details</label>
+        <div class="report-download-actions">
+          <button class="primary" id="downloadPdf" type="button">Download PDF</button>
+          <button class="ghost" id="downloadXlsx" type="button">Download Excel</button>
+        </div>
+        <p class="report-status" id="reportStatus" role="status" aria-live="polite"></p>
+      </section>
 
       <div class="thread" id="thread">
         <div class="welcome" id="welcome">

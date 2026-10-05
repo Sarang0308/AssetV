@@ -80,9 +80,24 @@ button { font: inherit; cursor: pointer; }
 /* ---------- chat ---------- */
 .chat { display: flex; flex-direction: column; height: 100vh; min-width: 0; }
 .chat-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 28px 10px; }
+.chat-head { position: relative; }
 .chat-head h1 { margin: 0; font-size: 20px; }
 .chat-head p { margin: 4px 0 0; font-size: 13px; }
+.head-actions { display: flex; flex: 0 0 auto; gap: 8px; }
 .ghost { border: 1px solid var(--border); background: transparent; color: var(--text-primary); border-radius: 8px; padding: 6px 12px; }
+.report-panel { position: absolute; z-index: 20; top: 100%; right: 28px; width: min(360px, calc(100vw - 32px)); padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-1); box-shadow: var(--shadow); }
+.report-panel[hidden], .report-fields[hidden] { display: none; }
+.report-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.report-panel-head h2 { margin: 0; font-size: 16px; }
+.report-panel .icon-btn { margin-left: 8px; }
+.report-fields { display: grid; gap: 10px; margin-top: 10px; }
+.report-panel label { display: grid; gap: 4px; color: var(--text-secondary); font-size: 12px; }
+.report-panel input:not([type="checkbox"]), .report-panel select { width: 100%; min-height: 36px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-1); color: var(--text-primary); font: inherit; }
+.report-toggle { display: flex !important; grid-template-columns: auto 1fr; align-items: center; gap: 8px !important; margin-top: 12px; }
+.report-download-actions { display: flex; gap: 8px; margin-top: 14px; }
+.report-download-actions button { min-height: 36px; }
+.report-status { min-height: 18px; margin: 8px 0 0; color: var(--text-muted); font-size: 12px; }
+.report-status.error { color: var(--critical); }
 .thread { flex: 1; overflow-y: auto; padding: 8px 28px 24px; display: flex; flex-direction: column; gap: 18px; }
 .welcome { margin-top: 24px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -139,6 +154,11 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 12.5px; }
   .rail { border-right: 0; border-bottom: 1px solid var(--border); }
   .chat { height: auto; min-height: 100vh; }
   .chat-head, .thread, .composer { padding-left: 16px; padding-right: 16px; }
+  .chat-head { align-items: center; }
+  .chat-head > div:first-child p { display: none; }
+  .head-actions { gap: 5px; }
+  .head-actions .ghost { padding: 6px 8px; font-size: 12px; }
+  .report-panel { right: 16px; }
   .charts { grid-template-columns: 1fr; }
   .gauge-card { grid-template-columns: 1fr; }
   .msg-user { max-width: 90%; }

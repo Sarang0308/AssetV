@@ -1,0 +1,21 @@
+<section>
+  <h2>Items for CA review</h2>
+  <p class="small muted">Flagged for a professional to check. No tax has been calculated.</p>
+  <table class="keep">
+    <thead><tr><th style="width:52mm">Item</th><th class="num" style="width:28mm">Total</th><th class="num" style="width:14mm">Count</th><th>Note for CA</th></tr></thead>
+    <tbody>
+    {% for i in d["items"] %}
+    <tr{% if i.related_to %} class="sub"{% endif %}><td>{% if i.related_to %}↳ {% endif %}{{ i.item }}</td><td class="num">{{ i.total|inr(2) }}</td><td class="num">{{ i.count }}</td><td>{{ i.note }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if d["items"]|selectattr("transactions")|list %}
+  <h3 style="margin-top:3mm">Flagged transactions</h3>
+  <table class="tight">
+    <thead><tr><th>Item</th><th>txn_id</th><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+    {% for i in d["items"] %}{% for t in i.transactions or [] %}<tr><td>{{ i.item }}</td><td>{{ t.txn_id }}</td><td>{{ t.date }}</td><td>{{ t.description }}</td><td class="num">{{ t.amount|inr(2) }}</td></tr>{% endfor %}{% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</section>

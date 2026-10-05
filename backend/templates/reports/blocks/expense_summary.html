@@ -1,0 +1,13 @@
+<section class="keep">
+  <h2>Expense summary by category</h2>
+  <table>
+    <thead><tr><th>Category</th><th class="num">Amount</th><th class="num">Share</th><th class="num">Transactions</th></tr></thead>
+    <tbody>
+    {% for i in d["items"] %}<tr><td>{{ i.name }}</td><td class="num">{{ i.amount|inr }}</td><td class="num">{{ i.share_pct|pct }}</td><td class="num">{{ i.transactions }}</td></tr>{% endfor %}
+    <tr class="total"><td>Total spending</td><td class="num">{{ d.spending_total|inr }}</td><td></td><td class="num muted small">avg {{ d.monthly_average|inr }}/month</td></tr>
+    </tbody>
+  </table>
+  <table class="small" style="margin-top:2mm">
+    <tbody>{% for m in d.memo %}<tr><td class="muted">Not included above: {{ m.name }}</td><td class="num">{{ m.amount|inr }}</td></tr>{% endfor %}</tbody>
+  </table>
+</section>

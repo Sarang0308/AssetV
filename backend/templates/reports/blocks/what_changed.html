@@ -1,0 +1,16 @@
+<section>
+  <h2>What changed</h2>
+  {% if not d.available %}
+  <p class="muted">This is the first month of data, so there is nothing to compare against.</p>
+  {% else %}
+  <p class="small muted">Spending by category this month vs the average of the previous {{ d.months_compared }} month(s) ({{ d.prior_label }}). <span class="up">Red</span> = increase, <span class="down">green</span> = decrease.</p>
+  <img class="chart" src="{{ d.chart }}" alt="Category spending change vs previous months">
+  <table class="tight">
+    <thead><tr><th>Category</th><th class="num">This month</th><th class="num">Prior avg</th><th class="num">Change</th><th class="num">Change %</th></tr></thead>
+    <tbody>
+    {% for r in d.rows %}<tr><td>{{ r.category }}</td><td class="num">{{ r.this_month|inr }}</td><td class="num">{{ r.prior_average|inr }}</td><td class="num {{ 'up' if r.change > 0 else 'down' if r.change < 0 else '' }}">{{ r.change|inr }}</td><td class="num">{{ r.change_pct|pct(true) if r.change_pct is not none else "new" }}</td></tr>{% endfor %}
+    <tr class="total"><td>Total spending</td><td class="num">{{ d.total.this_month|inr }}</td><td class="num">{{ d.total.prior_average|inr }}</td><td class="num">{{ d.total.change|inr }}</td><td class="num">{{ d.total.change_pct|pct(true) }}</td></tr>
+    </tbody>
+  </table>
+  {% endif %}
+</section>

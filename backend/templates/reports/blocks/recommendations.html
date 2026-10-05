@@ -1,0 +1,6 @@
+<section class="keep">
+  <h2>Recommendations</h2>
+  <ol class="recs">
+  {% for r in d["items"] %}<li><b>{{ r.title }}</b><br><span class="small">{{ r.why }}</span><br><span class="small muted">Impact: {{ r.impact }}</span></li>{% endfor %}
+  </ol>
+</section>

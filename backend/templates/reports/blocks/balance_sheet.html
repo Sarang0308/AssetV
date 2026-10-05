@@ -1,0 +1,24 @@
+<section class="keep">
+  <h2>Assets and liabilities <span class="muted small">as of {{ d.as_of }}</span></h2>
+  <div class="cols">
+    <div>
+      <table class="tight">
+        <thead><tr><th>Asset</th><th class="num">Value</th></tr></thead>
+        <tbody>
+        {% for a in d.assets %}<tr><td>{{ a.name }}</td><td class="num">{{ a.value|inr }}</td></tr>{% endfor %}
+        <tr class="total"><td>Total assets</td><td class="num">{{ d.asset_total|inr }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <table class="tight">
+        <thead><tr><th>Liability</th><th class="num">Outstanding</th><th class="num">Rate</th><th class="num">EMI</th><th>Next due</th></tr></thead>
+        <tbody>
+        {% for l in d.liabilities %}<tr><td>{{ l.type }}</td><td class="num">{{ l.outstanding|inr }}</td><td class="num">{{ l.rate_pct|rate }}</td><td class="num">{{ l.emi|inr }}</td><td>{{ l.next_due }}</td></tr>{% endfor %}
+        <tr class="total"><td>Total</td><td class="num">{{ d.liability_total|inr }}</td><td></td><td class="num">{{ d.total_emi|inr }}</td><td></td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:2mm"><b>Net worth: {{ d.net_worth|inr }}</b></p>
+    </div>
+  </div>
+</section>

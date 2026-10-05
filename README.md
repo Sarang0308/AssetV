@@ -1,122 +1,200 @@
-# Asset Vantage — Multi-Agent Financial Analyst
+# Asset Vantage — AI Financial Analyst
 
-A chatbot that answers *"Are we financially healthy?"* from raw CSVs. It follows the hackathon journey
-**Ingest → Calculate → Detect → Score → Recommend**, built as a Gemini function-calling multi-agent system:
-the LLM plans and explains, and a deterministic analytics engine computes every number.
+Ask questions about a household's money in plain English, such as *"Am I financially healthy?"*. You get
+an answer with charts. Built for the Asset Vantage hackathon:
+**Ingest → Calculate → Detect → Score → Recommend**.
+
+![How it works](Architecture.png)
+
+## How it works (in one minute)
 
 ```
-                         USER  ──►  Chat UI (streams agent steps + charts)
-                                        │  POST /api/chat (NDJSON events)
-                               ┌────────▼─────────┐
-                               │ Supervisor Agent │  conversation memory, planning,
-                               │   (Gemini)       │  render_chart, final answer
-                               └──┬─────┬──────┬──┘
-                delegate (parallel)   │      │
-        ┌─────────────────┐  ┌────────▼─────┐  ┌───────────────────────┐
-        │ Financial Agent │  │ Anomaly Agent│  │ Recommendation Agent  │
-        │ cashflow, spend,│  │ outliers,    │  │ health score, actions,│
-        │ assets, debt,   │  │ spikes, dupes│  │ what-if scenarios     │
-        │ net worth, fcst │  │ data quality │  │                       │
-        └────────┬────────┘  └──────┬───────┘  └──────────┬────────────┘
-                 └──────────── tool calls ────────────────┘
-                               ┌────────▼─────────┐
-                               │ Analytics engine │  pandas — single source of truth
-                               └────────┬─────────┘
-                               ┌────────▼─────────┐
-                               │ Clean dataset    │  dedupe, re-key, fix, quarantine
-                               └──────────────────┘
+You type a question
+      │
+      ▼
+Supervisor agent (Gemini) ── [plan] decides which specialists to ask   (LangGraph graph)
+      │
+      ├── Financial Agent ........ cash flow, spending, assets, loans, net worth, forecast
+      ├── Anomaly Agent .......... unusual transactions, spikes, data problems
+      └── Recommendation Agent ... health score, what to do next, "what if" scenarios
+                │
+                ▼
+      Python analytics (pandas) ── calculates every number from the CSV files
+                │
+                ▼
+Supervisor writes a short answer and picks charts ──► React website shows them
 ```
 
-**Key design rule:** numbers never pass through an LLM. Data tools return a `result_id`. The supervisor
-calls `render_chart(result_id, chart_type)`, and the backend builds the chart spec from the cached result.
+Full details and every formula are in `explanation.txt` (local file, not committed).
 
-## Run
+**The golden rule:** the AI never calculates or types numbers. It only chooses which calculation to run.
+Python does the maths, so the numbers are always correct.
+
+---
+
+## Setup (first time only)
+
+You need **Python 3.10+** and **Node.js 18+** installed.
+
+**1. Install the Python packages** (run in the `AssetV` folder):
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env        # add GEMINI_API_KEY
+```
+
+**2. Add your Gemini API key.** Copy `.env.example` to a new file called `.env`, then put your key after
+`GEMINI_API_KEY=` (no quotes, no spaces). Get a key at https://aistudio.google.com/apikey.
+
+```
+GEMINI_API_KEY=AIzaSy...your-key...
+```
+
+> Keep `.env` private. It is listed in `.gitignore`, so git will not upload it.
+
+**3. Build the website** (run in the `frontend` folder):
+
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+## Run it
+
+```bash
 python -m uvicorn backend.main:app --port 8000
 ```
 
-Open http://localhost:8000. A Gemini API key is required — without one, the dashboard rail still loads but chat
-replies with a configuration error. Models are set by `GEMINI_MODEL` (supervisor) and `GEMINI_WORKER_MODEL` (specialists).
+Open **http://localhost:8000** and click one of the example questions.
 
-## Data cleaning (`backend/data/loader.py`)
+If the sidebar says *"AI not connected"*, your key is missing or wrong. Fix `.env`, then stop the server
+(Ctrl+C) and start it again.
 
-All 12 intentional defects are detected and logged (`get_data_quality_report`):
+### Changing the website? Use dev mode
 
-| Issue | Rows | Handling |
+Building after every change is slow. Instead, run two terminals:
+
+```bash
+# terminal 1 — the Python API
+python -m uvicorn backend.main:app --port 8000 --reload
+```
+
+```bash
+# terminal 2 — the React site with instant reload
+cd frontend
+npm run dev
+```
+
+Then open **http://localhost:5173**. Edits to `frontend/src` show up immediately.
+
+---
+
+## Project map — where to change what
+
+| I want to… | Edit this file |
+|---|---|
+| Change colours, spacing, fonts | `frontend/src/styles.css` |
+| Change the example questions | `frontend/src/components/Chat.jsx` (`EXAMPLE_QUESTIONS`) |
+| Change the sidebar | `frontend/src/components/Sidebar.jsx` |
+| Change how a chart looks | `frontend/src/components/ChartView.jsx` |
+| Change what the AI agents are told | `backend/agent/prompts.py` |
+| Change the agent flow (LangGraph) | `backend/agent/graph.py` |
+| Add a new calculation | `backend/analytics/engine.py`, then register it in `backend/agent/tools.py` |
+| Change how a calculation becomes a chart | `backend/analytics/charts.py` |
+| Change how the raw data is cleaned | `backend/data/loader.py` |
+
+```
+AssetV/
+├── .env                  your API key (you create this)
+├── dataset/              the 3 CSV files
+├── backend/              Python
+│   ├── main.py           web server: /api/chat, /api/overview, /api/rechart
+│   ├── data/loader.py    reads + cleans the CSVs
+│   ├── analytics/
+│   │   ├── engine.py     all the financial maths (16 functions)
+│   │   ├── charts.py     turns results into chart descriptions
+│   │   └── periods.py    understands "last_6_months", "FY2025-26", ...
+│   └── agent/
+│       ├── graph.py      LangGraph: plan → specialists (parallel) → answer
+│       ├── prompts.py    all AI instructions + the 3 specialists
+│       ├── gemini.py     small Gemini helpers + token counter
+│       └── tools.py      the list of functions the AI is allowed to call
+└── frontend/             React website
+    └── src/
+        ├── App.jsx       page layout
+        ├── api.js        talks to the Python server
+        ├── format.js     ₹ formatting + colours
+        └── components/   Sidebar, Chat, Message, ChartCard, ChartView
+```
+
+### Adding a new question type (example)
+
+1. Write a function in `backend/analytics/engine.py` that returns a dict of numbers.
+2. Describe it in `backend/agent/tools.py` with `_tool("my_function", "what it does", {...params})`.
+3. Add its name to one specialist's `"tools"` list in `backend/agent/prompts.py`.
+4. (Optional) Add a chart for it in `backend/analytics/charts.py`.
+
+The AI picks up the new function on the next restart.
+
+---
+
+## Keeping AI costs low
+
+Every answer shows a line such as *"Used 4,900 AI tokens in 5 model calls"*. These choices keep that
+number small:
+
+- **Few model calls:** the LangGraph flow is fixed: 1 plan call, 1 call per specialist (run in parallel),
+  and 1 answer call.
+- **Charts cost no extra calls:** the supervisor writes `[[chart r3 line]]` in its answer, and the server
+  draws the chart from data it already has.
+- **Compact data:** results are sent to the AI as compact tables, about half the size of plain JSON.
+  Big data such as a 12×14 heatmap is summarised.
+- **Short instructions and memory:** function descriptions are kept short, and only the last 4 questions
+  are remembered (`GEMINI_HISTORY_TURNS`).
+- **Thinking off for specialists:** `GEMINI_WORKER_THINKING_BUDGET=0`.
+- **Free chart switching:** the chart-type dropdown re-draws a chart without calling the AI. The sidebar
+  numbers don't use the AI either.
+
+---
+
+## The data and what we fixed
+
+The CSVs contain deliberate mistakes. `backend/data/loader.py` finds all 12 and logs them. Ask the bot
+*"What was wrong with the raw data?"* to see the list.
+
+| Problem | Row | What we did |
 |---|---|---|
-| Exact duplicate row | T0410 | removed |
-| Duplicate ID, different txns | T0031, T0760 | re-keyed `-B` |
-| Non-ISO date `2026/06/15` | T0643 | normalised |
-| Missing description / category | T0138 / T0702 | kept as "Unspecified" / inferred from description |
-| Category ≠ description (`Foods` / Car loan EMI) | T0202 | corrected to Debt Payment |
-| Negative EMI (-4,500) | T0089 | quarantined |
-| Zero EMI | T0343 | kept, flagged as possible missed payment |
-| Date after snapshot (2026-11-15) | T0277 | quarantined |
-| Salary "correction" typed as expense (₹2.05 L) | T0556 | quarantined (reversal) |
-| ₹1,85,000 "Mobile" bill (206× typical) | T0488 | quarantined as data-entry outlier |
+| Same row twice | T0410 | removed |
+| Two different rows with the same ID | T0031, T0760 | renamed the second to `-B` |
+| Date written as `2026/06/15` | T0643 | fixed the format |
+| Missing description / category | T0138 / T0702 | "Unspecified" / guessed from description |
+| Car-loan EMI filed under "Foods" | T0202 | moved to Debt Payment |
+| Negative EMI (-₹4,500) | T0089 | left out of the numbers |
+| ₹0 EMI | T0343 | kept, flagged as a possible missed payment |
+| Date in the future (Nov 2026) | T0277 | left out |
+| Salary "correction" recorded as an expense | T0556 | left out |
+| ₹1,85,000 mobile bill (206× normal) | T0488 | left out as a typo |
 
-Quarantined rows are excluded from metrics but still surface in anomaly answers.
+### Health score (0–100)
 
-## Analytics tools (`backend/analytics/engine.py`)
-
-| Tool | Agent | Default chart |
+| Check | Points | Full points when |
 |---|---|---|
-| get_financial_summary | Financial / Recommendation | KPI tiles |
-| get_cashflow (period, granularity, exclusions) | Financial | combo (stacked outflows + income line) |
-| get_spending_breakdown (by category/description, filters) | Financial | doughnut |
-| compare_periods (any two periods) | Financial / Anomaly | grouped bar |
-| get_category_trend | Financial / Anomaly | line |
-| get_spending_heatmap | Financial | heatmap |
-| get_assets (exclude types, min value, by class) | Financial | doughnut |
-| get_liabilities (rates, payoff, missed EMIs, dues) | Financial / Recommendation | horizontal bar |
-| get_net_worth | Financial | waterfall |
-| forecast (N months) | Financial | area |
-| search_transactions | Financial / Anomaly | table |
-| detect_anomalies (robust z-score, spikes, bonus, quality) | Anomaly | scatter |
-| get_data_quality_report | Anomaly | table |
-| get_health_score (0–100, 6 weighted components) | Recommendation | gauge |
-| get_recommendations (₹-quantified, ranked) | Recommendation | table |
-| simulate_scenario (what-if: cuts, payoffs, income) | Recommendation | before/after bars |
+| Savings rate | 25 | you save ≥ 30% of income |
+| Loan EMIs ÷ income | 20 | ≤ 20% |
+| Emergency fund | 20 | cash covers ≥ 6 months of spending |
+| Debt ÷ assets | 15 | ≤ 30% |
+| Expensive debt | 10 | no loans above 15% interest |
+| Spending discipline | 10 | spending is not growing |
 
-Periods accept `last_6_months`, `ytd`, `2025`, `FY2025-26` (Indian FY), `Q2-2026`, `2026-03`, and
-`2025-10:2026-03`. Users can switch any chart to another valid type from its dropdown (`/api/rechart`),
-which needs no LLM call.
-
-### Health score (trailing 12 months)
-
-| Component | Weight | Full marks at |
-|---|---|---|
-| Savings rate | 25 | ≥ 30% |
-| EMI / income | 20 | ≤ 20% |
-| Emergency fund | 20 | ≥ 6 months of outflows |
-| Debt-to-asset | 15 | ≤ 30% |
-| High-interest debt | 10 | none above 15% |
-| Spending discipline | 10 | spending not growing |
-
-The current result is **79/100 (Good)**. Savings (35%) and EMI load (17%) are strong. The weak spots are spending,
-up 20% over the last 6 months, and leverage at 47.5%.
+This household scores **79/100 (Good)**.
 
 ## Demo script
 
-1. "Am I financially healthy?" → gauge + KPIs
-2. "Why?" → what changed + score radar
-3. "Show my income and expenses for the last 6 months and where I spend the most" → two charts in parallel
-4. "Exclude my one-time expenses" → same analysis re-run with filters
-5. "Are there unusual transactions?" → scatter + table, including quarantined rows
-6. "What if I pay off my credit card and cut shopping by 30%?" → score 79 → 83
-7. "Okay, what should I do next?" → 3 ranked, ₹-quantified actions
-
-## Layout
-
-```
-backend/
-  main.py            FastAPI: /api/chat (stream), /api/overview, /api/rechart
-  data/loader.py     ingest + clean + issue log
-  analytics/         periods.py · engine.py · charts.py (chart specs)
-  agent/             agent.py (supervisor + specialists) · tools.py (schemas, dispatch)
-frontend/            index.html · styles.css · app.js (Chart.js renderer, light/dark)
-dataset/             the three CSVs
-```
+1. "Am I financially healthy?"
+2. "Why?"
+3. "Show my income and expenses for the last 6 months and where I spend the most"
+4. "Exclude my one-time expenses"
+5. "Are there any unusual transactions?"
+6. "What if I pay off my credit card and cut shopping by 30%?"
+7. "What should I do next?"

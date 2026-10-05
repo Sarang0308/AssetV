@@ -10,11 +10,11 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from fastapi import FastAPI, HTTPException, Query, Request  # noqa: E402
-from fastapi.responses import FileResponse, Response, StreamingResponse  # noqa: E402
+from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
-from backend.agent.agent import MODEL, get_session, llm_available, run_turn  # noqa: E402
+from backend.agent.graph import MODEL, get_session, llm_available, run_turn  # noqa: E402
 from backend.analytics import engine  # noqa: E402
 from backend.analytics.charts import build_chart  # noqa: E402
 from backend.reports.definitions import ReportInputError, build_report  # noqa: E402
@@ -92,6 +92,7 @@ def overview():
         "quality": {k: v for k, v in engine.get_data_quality_report().items() if k != "issues"},
         "upcoming_dues": engine.get_liabilities()["upcoming_dues"],
         "report_periods": engine.get_report_periods(),
+        "debt_alerts": engine.get_debt_alerts(),
     }
 
 
@@ -119,14 +120,28 @@ def report(
                     headers={"Content-Disposition": f'attachment; filename="{report.filename_stem}.{fmt}"'})
 
 
+@app.get("/api/debt-alerts")
+def debt_alerts(today: str | None = None, horizon_days: int = 10):
+    """Debt payment alerts, most urgent first. Optional ?today=YYYY-MM-DD to simulate another date."""
+    return engine.get_debt_alerts(today, horizon_days)
+
+
 @app.get("/api/health")
 def healthcheck():
     return {"ok": True, "llm": llm_available()}
 
 
-app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
+# Serve the built React app (created by `npm run build` in frontend/) from the same server,
+# so after building you only need to run this one Python server.
+DIST = FRONTEND / "dist"
+if (DIST / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
 
 
 @app.get("/")
 def index():
-    return FileResponse(FRONTEND / "index.html")
+    if (DIST / "index.html").exists():
+        return FileResponse(DIST / "index.html")
+    return HTMLResponse("<h3>Frontend not built yet.</h3><p>Run <code>npm install</code> and "
+                        "<code>npm run build</code> inside the <code>frontend</code> folder, then refresh. "
+                        "(Or use <code>npm run dev</code> and open http://localhost:5173.)</p>")

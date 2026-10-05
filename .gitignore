@@ -1,79 +1,13 @@
-# Environment Variables & Secrets
+# Secrets — never commit your API key
 .env
-.env*.local
-.env.development
-.env.production
-.env.example
 
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+*.pyc
 
-# Virtual Environments
-.venv/
-venv/
-ENV/
-env/
-env.bak/
-venv.bak/
+# Frontend (re-created by `npm install` / `npm run build`)
+frontend/node_modules/
+frontend/dist/
 
-# Testing & Type Checking
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.nox/
-.mypy_cache/
-.ruff_cache/
-
-# IDEs and Code Editors
-.vscode/
-.idea/
-.claude/
-*.swp
-*.swo
-*~
-*.sublime-workspace
-*.sublime-project
-
-# Operating System Files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-Thumbs.db
-ehthumbs.db
-[Dd]esktop.ini
-
-# Logs and Runtime Databases
-*.log
-*.sqlite
-*.sqlite3
-*.db
-
-# Node / Frontend (if build tools are added)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Local notes
+explanation.txt

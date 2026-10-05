@@ -9,3 +9,4 @@ Jinja2>=3.1
 WeasyPrint>=62
 XlsxWriter>=3.2
 matplotlib>=3.8
+langgraph>=1.0

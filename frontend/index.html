@@ -1,103 +1,13 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Vantage Analyst</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-</head>
-<body>
-  <div class="app">
-    <aside class="rail" id="rail">
-      <div class="brand">
-        <div class="logo" aria-hidden="true">AV</div>
-        <div>
-          <div class="brand-name">Asset Vantage</div>
-          <div class="brand-sub">Financial analyst agent</div>
-        </div>
-        <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
-      </div>
-
-      <section class="card" id="healthCard">
-        <h3>Financial health</h3>
-        <div class="gauge-wrap"><canvas id="railGauge" height="120"></canvas><div class="gauge-label" id="gaugeLabel"></div></div>
-        <ul class="breakdown" id="breakdown"></ul>
-      </section>
-
-      <section class="card">
-        <h3>Snapshot <span class="muted small" id="basis"></span></h3>
-        <div class="kpis" id="railKpis"></div>
-      </section>
-
-      <section class="card">
-        <h3>Upcoming dues</h3>
-        <ul class="dues" id="dues"></ul>
-      </section>
-
-      <section class="card quality" id="quality"></section>
-      <div class="mode" id="mode"></div>
-    </aside>
-
-    <main class="chat">
-      <header class="chat-head">
-        <div>
-          <h1>Ask about your money</h1>
-          <p class="muted">Every number is computed by the analytics engine; the agent plans the queries and explains the results.</p>
-        </div>
-        <div class="head-actions">
-          <button class="ghost" id="downloadReport" type="button" aria-expanded="false" aria-controls="reportPanel">Download report</button>
-          <button class="ghost" id="newChat">New chat</button>
-        </div>
-      </header>
-      <section class="report-panel" id="reportPanel" aria-label="Download report" hidden>
-        <div class="report-panel-head">
-          <h2>Download report</h2>
-          <button class="icon-btn" id="closeReport" type="button" aria-label="Close report panel">×</button>
-        </div>
-        <label>Report type
-          <select id="reportType">
-            <option value="ca_pack">Tax / CA pack</option>
-            <option value="monthly">Monthly review</option>
-          </select>
-        </label>
-        <div id="caPackFields" class="report-fields">
-          <label>Financial year
-            <select id="reportFy">
-              <option value="2025-26" selected>FY 2025-26</option>
-              <option value="2024-25">FY 2024-25 · partial period</option>
-              <option value="2026-27">FY 2026-27 · partial period</option>
-            </select>
-          </label>
-          <label>Name (optional)<input id="reportName" type="text" autocomplete="name"></label>
-          <label>PAN (optional)<input id="reportPan" type="text" autocomplete="off" spellcheck="false"></label>
-        </div>
-        <div id="monthlyFields" class="report-fields" hidden>
-          <label>Month<input id="reportMonth" type="month" value="2026-09"></label>
-        </div>
-        <label class="report-toggle"><input id="hideDetails" type="checkbox"> Hide transaction details</label>
-        <div class="report-download-actions">
-          <button class="primary" id="downloadPdf" type="button">Download PDF</button>
-          <button class="ghost" id="downloadXlsx" type="button">Download Excel</button>
-        </div>
-        <p class="report-status" id="reportStatus" role="status" aria-live="polite"></p>
-      </section>
-
-      <div class="thread" id="thread">
-        <div class="welcome" id="welcome">
-          <p class="muted">Try one of these, or ask anything:</p>
-          <div class="chips" id="chips"></div>
-        </div>
-      </div>
-
-      <form class="composer" id="composer">
-        <textarea id="input" rows="1" placeholder="e.g. Show my income vs expenses for the last 6 months and where I spend the most" autocomplete="off"></textarea>
-        <button type="submit" id="send" class="primary">Send</button>
-      </form>
-    </main>
-  </div>
-  <script src="/static/app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asset Vantage Analyst</title>
+  </head>
+  <body>
+    <!-- React draws the whole app inside this div (see src/main.jsx) -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

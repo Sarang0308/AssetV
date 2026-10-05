@@ -23,6 +23,7 @@ CHART_OPTIONS: dict[str, tuple[str, list[str]]] = {
     "get_spending_heatmap": ("heatmap", ["heatmap", "table"]),
     "get_assets": ("doughnut", ["doughnut", "pie", "bar", "hbar", "table"]),
     "get_liabilities": ("hbar", ["hbar", "bar", "doughnut", "table"]),
+    "get_debt_alerts": ("table", ["table", "hbar"]),
     "get_net_worth": ("waterfall", ["waterfall", "bar", "table", "kpi"]),
     "detect_anomalies": ("scatter", ["scatter", "table"]),
     "get_health_score": ("gauge", ["gauge", "radar", "hbar", "table"]),
@@ -132,6 +133,17 @@ def _build(tool, d, t, title):  # noqa: C901 — one branch per tool keeps this 
     if tool == "get_assets":
         return _items_chart(t, title or f"Asset allocation · ₹{d['total']:,}", d["items"], "name", "value",
                             extra_cols=("share_pct",))
+
+    if tool == "get_debt_alerts":
+        title = title or f"Debt alerts · as of {d['reference_date']}"
+        if t == "hbar":
+            sched = d["schedule"]
+            return {"type": "hbar", "title": f"EMIs due · days left (as of {d['reference_date']})", "unit": "",
+                    "labels": [f"{s['loan']} (₹{s['emi']:,})" for s in sched],
+                    "series": [{"name": "Days left", "data": [s["days_left"] for s in sched]}]}
+        cols = ["severity", "title", "detail", "action"]
+        return {"type": "table", "title": title, "columns": cols,
+                "rows": [[a["severity"].upper(), a["title"], a["detail"], a["action"]] for a in d["alerts"]]}
 
     if tool == "get_liabilities":
         items = d["items"]

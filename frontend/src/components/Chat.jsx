@@ -5,6 +5,7 @@ import Message from "./Message.jsx";
 
 const EXAMPLE_QUESTIONS = [
   "Am I financially healthy?",
+  "Any loan payments due? Am I paying on time?",
   "Show my income and expenses for the last 6 months",
   "Where does my money go?",
   "Show my assets as a bar chart, excluding real estate",

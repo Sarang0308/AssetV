@@ -153,3 +153,9 @@ button, input, select { font: inherit; }
   .bubble-user { max-width: 90%; }
   .composer { position: sticky; bottom: 0; background: white; }
 }
+
+/* Loan payment alerts card */
+.alerts { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.alert { border-left: 3px solid var(--border); padding: 3px 0 3px 8px; font-size: 13px; }
+.alert-title { font-weight: 600; display: flex; gap: 6px; align-items: baseline; }
+.sev { color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 4px; flex-shrink: 0; }

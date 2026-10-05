@@ -2,6 +2,7 @@
 // The numbers come from /api/overview and do NOT use the AI (so they cost no tokens).
 import { useEffect, useState } from "react";
 import { fetchOverview } from "../api.js";
+import DebtAlerts from "./DebtAlerts.jsx";
 import { formatMoney, formatMoneyFull, scoreColor, statusColor } from "../format.js";
 
 export default function Sidebar() {
@@ -52,20 +53,7 @@ export default function Sidebar() {
         </div>
       </section>
 
-      <section className="card">
-        <h3>Upcoming loan payments</h3>
-        {overview.upcoming_dues.map((due) => (
-          <div className="row" key={due.type}>
-            <span>{due.type}</span>
-            <span>
-              {formatMoneyFull(due.emi)}{" "}
-              <span className="muted">
-                · {new Date(due.due).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-              </span>
-            </span>
-          </div>
-        ))}
-      </section>
+      <DebtAlerts data={overview.debt_alerts} />
 
       <section className="card">
         <h3>Data quality</h3>

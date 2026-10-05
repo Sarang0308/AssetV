@@ -325,6 +325,112 @@ def get_liabilities() -> dict:
     }
 
 
+# ---------------------------------------------------------------- debt alerts
+LOAN_PAYMENT_DESCRIPTION = {"Home Loan": "Home loan EMI", "Car Loan": "Car loan EMI",
+                            "Credit Card": "Credit card payment"}
+_SEVERITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
+
+
+def _ordinal(n: int) -> str:
+    return f"{n}{'th' if 11 <= n % 100 <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
+
+
+def get_debt_alerts(today: str | None = None, horizon_days: int = 10) -> dict:
+    """Debt payment alerts: upcoming/overdue EMIs, cash to cover them, late or missed payments in the
+    history, underpaid credit card bills and expensive debt. `today` defaults to the real date (never earlier
+    than the data snapshot), so the demo shows what is due right now."""
+    ds = _ds()
+    as_of = ds.as_of.normalize()
+    ref = pd.Timestamp(today).normalize() if today else max(pd.Timestamp.today().normalize(), as_of)
+    liab = ds.liabilities
+    tx = ds.transactions                      # all rows, including quarantined ones (a reversal is still a missed EMI)
+    alerts = []
+
+    def add(severity, kind, loan, title, detail, action, amount=None, due=None, days=None):
+        alerts.append({"severity": severity, "type": kind, "loan": loan, "title": title, "detail": detail,
+                       "action": action, "amount": _r(amount) if amount is not None else None,
+                       "due_date": str(due.date()) if due is not None else None, "days_left": days})
+
+    # 1. Upcoming and overdue EMIs (due dates roll forward monthly)
+    upcoming_total = 0
+    schedule = []
+    for _, l in liab.iterrows():
+        due = l["due_date"]
+        while due < ref - pd.Timedelta(days=31):            # stale due date -> move to the current cycle
+            due = due + pd.DateOffset(months=1)
+        days = int((due - ref).days)
+        schedule.append({"loan": l["type"], "emi": _r(l["emi"]), "due_date": str(due.date()), "days_left": days})
+        if days < 0:
+            add("critical", "overdue", l["type"], f"{l['type']} EMI overdue by {-days} day{'s' * (days != -1)}",
+                f"₹{l['emi']:,.0f} was due on {due:%d %b}.", "Pay today to avoid late fees and a credit-score hit.",
+                l["emi"], due, days)
+        elif days <= horizon_days:
+            when = "today" if days == 0 else "tomorrow" if days == 1 else f"in {days} days"
+            sev = "critical" if days == 0 else "high" if days <= 3 else "medium"
+            add(sev, "due_soon", l["type"], f"{l['type']} EMI of ₹{l['emi']:,.0f} due {when}",
+                f"Due on {due:%d %b %Y}.", "Keep the amount in the paying account; set up auto-debit.",
+                l["emi"], due, days)
+            upcoming_total += l["emi"]
+
+    # 2. Can the bank balance cover what is due soon?
+    cash = ds.assets.loc[ds.assets["type"].isin(["Savings Account", "Current Account"]), "value"].sum()
+    if upcoming_total:
+        if cash < upcoming_total:
+            add("critical", "cash_shortfall", None, "Not enough cash for upcoming EMIs",
+                f"₹{upcoming_total:,.0f} due in the next {horizon_days} days vs ₹{cash:,.0f} in bank accounts.",
+                "Move money from the FD or delay discretionary spending.", upcoming_total - cash)
+        else:
+            add("info", "cash_ok", None, f"Bank balance covers the next {horizon_days} days of EMIs",
+                f"₹{upcoming_total:,.0f} due vs ₹{cash:,.0f} in savings and current accounts.",
+                "No action needed.", upcoming_total)
+
+    # 3. Payment history: missed, reversed or late payments
+    for _, l in liab.iterrows():
+        desc = LOAN_PAYMENT_DESCRIPTION.get(l["type"])
+        rows = tx[tx["description"] == desc]
+        if desc is None or rows.empty:
+            continue
+        bad = rows[rows["amount"] <= 0]
+        for _, r in bad.iterrows():
+            what = "zero payment" if r["amount"] == 0 else f"reversed payment (₹{r['amount']:,.0f})"
+            add("high", "missed_payment", l["type"], f"Missed {l['type']} EMI in {r['date']:%b %Y}",
+                f"{r['txn_id']} recorded a {what} instead of ₹{l['emi']:,.0f}.",
+                "Check with the lender for penalties; confirm the EMI is now current.", l["emi"], r["date"])
+        paid = rows[rows["amount"] > 0]
+        due_day = int(l["due_date"].day)
+        late = paid[paid["date"].dt.day > due_day]
+        if len(late) >= 3:
+            days_late = int((late["date"].dt.day - due_day).median())
+            add("high" if days_late > 7 else "medium", "habitually_late", l["type"],
+                f"{l['type']} paid late {len(late)} of {len(paid)} times",
+                f"Due on the {_ordinal(due_day)}, usually paid on the {_ordinal(int(late['date'].dt.day.median()))} "
+                f"(~{days_late} day{'s' * (days_late != 1)} late).",
+                f"Schedule auto-debit before the {_ordinal(due_day)} to avoid late fees.")
+        if l["type"] == "Credit Card":
+            short = paid[paid["amount"] < l["emi"]]
+            if len(short):
+                add("high", "underpaid", l["type"],
+                    f"Credit card underpaid in {len(short)} of {len(paid)} months",
+                    f"Payments below the ₹{l['emi']:,.0f} due (lowest ₹{short['amount'].min():,.0f}) leave a "
+                    f"balance revolving at {l['interest_rate']:g}%.",
+                    "Pay the full due every month, or clear the card from savings.",
+                    (l["emi"] - short["amount"]).sum())
+
+    # 4. Expensive debt
+    for _, l in liab[liab["interest_rate"] > 15].iterrows():
+        yearly = l["outstanding"] * l["interest_rate"] / 100
+        add("high", "high_interest", l["type"], f"{l['type']} at {l['interest_rate']:g}% interest",
+            f"₹{l['outstanding']:,.0f} outstanding costs about ₹{yearly:,.0f} a year in interest.",
+            "Clear it first (avalanche method): it is the most expensive debt.", yearly)
+
+    alerts.sort(key=lambda a: (_SEVERITY_RANK[a["severity"]], a["days_left"] if a["days_left"] is not None else 99))
+    counts = {s: sum(a["severity"] == s for a in alerts) for s in _SEVERITY_RANK}
+    return {"reference_date": str(ref.date()), "horizon_days": horizon_days,
+            "due_in_horizon": _r(upcoming_total), "bank_balance": _r(cash),
+            "schedule": sorted(schedule, key=lambda d: d["days_left"]),
+            "counts": {k: v for k, v in counts.items() if v}, "alerts": alerts}
+
+
 def get_net_worth() -> dict:
     ds = _ds()
     a, l = ds.assets, ds.liabilities

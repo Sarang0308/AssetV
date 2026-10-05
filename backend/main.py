@@ -70,7 +70,14 @@ def overview():
         "assets": build_chart("get_assets", engine.get_assets(), "doughnut", "Assets"),
         "quality": {k: v for k, v in engine.get_data_quality_report().items() if k != "issues"},
         "upcoming_dues": engine.get_liabilities()["upcoming_dues"],
+        "debt_alerts": engine.get_debt_alerts(),
     }
+
+
+@app.get("/api/debt-alerts")
+def debt_alerts(today: str | None = None, horizon_days: int = 10):
+    """Debt payment alerts, most urgent first. Optional ?today=YYYY-MM-DD to simulate another date."""
+    return engine.get_debt_alerts(today, horizon_days)
 
 
 @app.get("/api/health")

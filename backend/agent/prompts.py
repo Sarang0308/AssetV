@@ -21,19 +21,19 @@ SPECIALISTS = {
         "about": "cash flow, income, spending, period comparisons, trends, assets, loans, net worth, forecast",
         "tools": ["get_financial_summary", "get_cashflow", "get_spending_breakdown", "compare_periods",
                   "get_category_trend", "get_spending_heatmap", "get_assets", "get_liabilities",
-                  "get_net_worth", "forecast", "search_transactions"],
+                  "get_net_worth", "forecast", "search_transactions", "get_debt_alerts"],
     },
     "anomaly": {
         "label": "Anomaly Agent",
-        "about": "unusual transactions, spending spikes, duplicates and data problems, missed payments",
+        "about": "unusual transactions, spending spikes, duplicates and data problems, missed payments, loan payment alerts",
         "tools": ["detect_anomalies", "get_data_quality_report", "search_transactions",
-                  "get_category_trend", "compare_periods"],
+                  "get_category_trend", "compare_periods", "get_debt_alerts"],
     },
     "recommendation": {
         "label": "Recommendation Agent",
         "about": "health score, what to do next, what-if scenarios",
         "tools": ["get_health_score", "get_recommendations", "simulate_scenario",
-                  "get_financial_summary", "get_liabilities"],
+                  "get_financial_summary", "get_liabilities", "get_debt_alerts"],
     },
 }
 

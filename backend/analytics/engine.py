@@ -724,8 +724,7 @@ def search_transactions(period: str = "all", categories=None, description_contai
     limit = int(max(1, min(limit, 100)))
     rows = [{"txn_id": r["txn_id"], "date": str(r["date"].date()), "category": r["category"],
              "description": r["description"], "amount": _r(r["amount"], 2), "type": r["type"],
-             "original_txn_id": r["original_txn_id"], "flags": ", ".join(r["flags"])}
-            for _, r in df.head(limit).iterrows()]
+             "flags": ", ".join(r["flags"])} for _, r in df.head(limit).iterrows()]
     return {"period": label, "matches": int(len(df)), "total_amount": _r(df["amount"].sum()), "rows": rows}
 
 
@@ -736,8 +735,21 @@ def _raw_month_range(period: str | None, ds: Dataset):
 
 
 def get_data_quality_report(period: str | None = None) -> dict:
-    """Cleaning log. With `period`, only issues whose affected row falls in that period (with row details)."""
+    """Cleaning log. With `period` (used by reports), only issues whose affected row falls in that
+    period, enriched with row details. Without it, the original whole-dataset log."""
     ds = _ds()
+    if not period:
+        issues = [{k: v for k, v in i.items() if k != "row_id"} for i in ds.issues]
+        return {
+            "rows_after_dedup": int(len(ds.transactions)),
+            "rows_used_in_metrics": int(len(ds.txns)),
+            "rows_excluded": int(ds.transactions["excluded"].sum()),
+            "issues_found": len(issues),
+            "by_severity": pd.Series([i["severity"] for i in issues]).value_counts().to_dict(),
+            "issues": issues,
+            "coverage": f"{ds.window_start.strftime('%b %Y')} – "
+                        f"{(ds.window_end - pd.Timedelta(days=1)).strftime('%b %Y')}",
+        }
     rows = ds.transactions.set_index("txn_id")
     issues = []
     for issue in ds.issues:

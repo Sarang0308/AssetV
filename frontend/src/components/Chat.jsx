@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { askAgents } from "../api.js";
 import Message from "./Message.jsx";
+import ReportPanel from "./ReportPanel.jsx";
 
 const EXAMPLE_QUESTIONS = [
   "Am I financially healthy?",
@@ -90,9 +91,12 @@ export default function Chat() {
             the AI never guesses numbers.
           </p>
         </div>
-        {messages.length > 0 && (
-          <button className="button-secondary" onClick={newChat}>New chat</button>
-        )}
+        <div className="header-actions">
+          <ReportPanel />
+          {messages.length > 0 && (
+            <button className="button-secondary" onClick={newChat}>New chat</button>
+          )}
+        </div>
       </header>
 
       <div className="messages">

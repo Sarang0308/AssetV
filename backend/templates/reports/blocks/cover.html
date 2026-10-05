@@ -1,0 +1,17 @@
+<section class="cover{% if d.compact %} compact{% endif %}">
+  <h1>{{ d.title }}</h1>
+  {% if d.compact %}
+  <p class="muted">{{ d.period_heading }} · {{ d.transaction_count }} transactions analysed{% if d.hide_details %} · transaction details hidden{% endif %}</p>
+  {% else %}
+  <p style="font-size:12pt;margin-top:2mm">{{ d.period_heading }}{% if d.partial %}<span class="badge">Partial period</span>{% endif %}</p>
+  <table class="small" style="width:auto;margin-top:4mm">
+    {% if d.name %}<tr><td class="muted">Name</td><td>{{ d.name }}</td></tr>{% endif %}
+    {% if d.pan %}<tr><td class="muted">PAN</td><td>{{ d.pan }}</td></tr>{% endif %}
+    <tr><td class="muted">Data covered</td><td>{{ d.period_label }}{% if d.partial %} (transaction data does not cover the full financial year){% endif %}</td></tr>
+    <tr><td class="muted">Transactions used</td><td>{{ d.transaction_count }} cleaned transactions</td></tr>
+    <tr><td class="muted">Generated</td><td>{{ d.generated_at }}</td></tr>
+    <tr><td class="muted">Report ID</td><td>{{ d.report_id }}</td></tr>
+    {% if d.hide_details %}<tr><td class="muted">Sharing</td><td>Transaction-level details omitted</td></tr>{% endif %}
+  </table>
+  {% endif %}
+</section>

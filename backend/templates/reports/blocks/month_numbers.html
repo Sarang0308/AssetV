@@ -1,0 +1,9 @@
+<section class="keep">
+  <h2>Month in numbers</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Income</div><div class="v">{{ d.income|inr }}</div></div>
+    <div class="kpi"><div class="l">Spending (excl. investments &amp; EMIs)</div><div class="v">{{ d.spending|inr }}</div></div>
+    <div class="kpi"><div class="l">Savings rate</div><div class="v">{{ d.savings_rate_pct|pct }}</div></div>
+  </div>
+  <p class="small muted" style="margin-top:1.5mm">Also this month: investments {{ d.investments|inr }} (counted as saving) · debt repayments {{ d.debt_payments|inr }} · net cash flow {{ d.net_cash_flow|inr }}.</p>
+</section>

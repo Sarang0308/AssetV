@@ -1,0 +1,16 @@
+<section class="keep">
+  <h2>Upcoming payments <span class="muted small">next 10 days · {{ d.window }}</span></h2>
+  {% if d["items"] %}
+  <table class="tight">
+    <thead><tr><th>Payment</th><th>Due</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+    {% for i in d["items"] %}<tr><td>{{ i.type }}</td><td>{{ i.due }}</td><td class="num">{{ i.amount|inr }}</td></tr>{% endfor %}
+    <tr class="total"><td colspan="2">Total due</td><td class="num">{{ d.total_due|inr }}</td></tr>
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">No payments due in the next 10 days.</p>
+  {% endif %}
+  <p style="margin-top:1.5mm">Current account balance {{ d.current_account_balance|inr }} →
+    <b class="{{ '' if d.covered else 'up' }}">{{ d.balance_after_dues|inr }} after these payments</b>{% if not d.covered %} (shortfall: top up before the due dates){% endif %}.</p>
+</section>

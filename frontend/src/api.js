@@ -46,3 +46,23 @@ export async function changeChartType(sessionId, resultId, chartType) {
   });
   return response.json();
 }
+
+// Download a report (PDF / Excel) and save it with the filename the server suggests.
+export async function downloadReport(params) {
+  const response = await fetch(`/api/report?${new URLSearchParams(params)}`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.detail || `Report download failed (${response.status}).`);
+  }
+  const blob = await response.blob();
+  const disposition = response.headers.get("Content-Disposition") || "";
+  const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] || `FinSight_Report.${params.format}`;
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}

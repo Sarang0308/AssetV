@@ -59,8 +59,10 @@ class Dataset:
         return self.transactions[~self.transactions["excluded"]]
 
 
-def _issue(issues, kind, severity, action, txn_id=None, detail=""):
-    issues.append({"txn_id": txn_id, "issue": kind, "severity": severity, "action": action, "detail": detail})
+def _issue(issues, kind, severity, action, txn_id=None, detail="", row_id=None):
+    """`row_id` is the cleaned txn_id of the affected row when it differs from `txn_id` (re-keyed rows)."""
+    issues.append({"txn_id": txn_id, "row_id": row_id or txn_id, "issue": kind, "severity": severity,
+                   "action": action, "detail": detail})
 
 
 def _parse_dates(df: pd.DataFrame, issues: list) -> None:
@@ -91,6 +93,7 @@ def load_dataset(data_dir: Path = DATA_DIR) -> Dataset:
     liabilities = pd.read_csv(data_dir / "liabilities.csv")
 
     tx = tx.apply(lambda c: c.str.strip())
+    tx["original_txn_id"] = tx["txn_id"]
     tx["flags"] = [[] for _ in range(len(tx))]
     tx["excluded"] = False
 
@@ -107,7 +110,7 @@ def load_dataset(data_dir: Path = DATA_DIR) -> Dataset:
             for n, idx in enumerate(grp.index[1:], start=1):
                 new_id = f"{txn_id}-{chr(ord('A') + n)}"
                 _issue(issues, "Duplicate transaction ID (different transactions)", "medium",
-                       f"Re-keyed as {new_id}", txn_id, tx.at[idx, "description"])
+                       f"Re-keyed as {new_id}", txn_id, tx.at[idx, "description"], row_id=new_id)
                 tx.at[idx, "txn_id"] = new_id
 
     # 3. dates

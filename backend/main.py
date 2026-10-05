@@ -3,22 +3,43 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode
 
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-from fastapi import FastAPI  # noqa: E402
-from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse  # noqa: E402
+from fastapi import FastAPI, HTTPException, Query, Request  # noqa: E402
+from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
 from backend.agent.graph import MODEL, get_session, llm_available, run_turn  # noqa: E402
 from backend.analytics import engine  # noqa: E402
 from backend.analytics.charts import build_chart  # noqa: E402
+from backend.reports.definitions import ReportInputError, build_report  # noqa: E402
+from backend.reports.pdf import render_pdf  # noqa: E402
+from backend.reports.xlsx import render_xlsx  # noqa: E402
+
+MEDIA_TYPES = {"pdf": "application/pdf",
+               "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
 
 FRONTEND = Path(__file__).resolve().parents[1] / "frontend"
 app = FastAPI(title="Asset Vantage — Financial Analyst Agent")
+
+
+@app.middleware("http")
+async def remove_pan_from_access_log(request: Request, call_next):
+    """Keep the PAN transient and remove it before access logging sees the query."""
+    if request.url.path == "/api/report":
+        query = request.scope.get("query_string", b"").decode("latin-1")
+        pairs = parse_qsl(query, keep_blank_values=True)
+        pans = [value for key, value in pairs if key == "pan"]
+        request.scope.setdefault("state", {})["report_pan"] = pans[0] if pans else None
+        request.scope["query_string"] = urlencode(
+            [(key, value) for key, value in pairs if key != "pan"]
+        ).encode("ascii")
+    return await call_next(request)
 
 
 class ChatRequest(BaseModel):
@@ -70,8 +91,33 @@ def overview():
         "assets": build_chart("get_assets", engine.get_assets(), "doughnut", "Assets"),
         "quality": {k: v for k, v in engine.get_data_quality_report().items() if k != "issues"},
         "upcoming_dues": engine.get_liabilities()["upcoming_dues"],
+        "report_periods": engine.get_report_periods(),
         "debt_alerts": engine.get_debt_alerts(),
     }
+
+
+@app.get("/api/report")
+def report(
+    request: Request,
+    report_type: str = Query("ca_pack", alias="type"),
+    fy: str | None = Query(None),
+    month: str | None = Query(None),
+    fmt: str = Query("pdf", alias="format"),
+    name: str | None = Query(None),
+    hide_details: bool = Query(False),
+):
+    """Download a CA review pack (PDF/XLSX) or a two-page monthly review (PDF).
+
+    The PAN is taken from request state (see the middleware), not from a query parameter.
+    """
+    pan = request.scope.get("state", {}).get("report_pan")
+    try:
+        report = build_report(report_type, fmt, fy=fy, month=month, name=name, pan=pan, hide_details=hide_details)
+    except ReportInputError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    content = render_xlsx(report) if fmt == "xlsx" else render_pdf(report)
+    return Response(content=content, media_type=MEDIA_TYPES[fmt],
+                    headers={"Content-Disposition": f'attachment; filename="{report.filename_stem}.{fmt}"'})
 
 
 @app.get("/api/debt-alerts")

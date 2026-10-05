@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse  # n
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
-from backend.agent.agent import MODEL, get_session, llm_available, run_turn  # noqa: E402
+from backend.agent.graph import MODEL, get_session, llm_available, run_turn  # noqa: E402
 from backend.analytics import engine  # noqa: E402
 from backend.analytics.charts import build_chart  # noqa: E402
 

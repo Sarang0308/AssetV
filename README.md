@@ -12,7 +12,7 @@ an answer with charts. Built for the Asset Vantage hackathon:
 You type a question
       │
       ▼
-Supervisor agent (Gemini) ── decides which specialists to ask
+Supervisor agent (Gemini) ── [plan] decides which specialists to ask   (LangGraph graph)
       │
       ├── Financial Agent ........ cash flow, spending, assets, loans, net worth, forecast
       ├── Anomaly Agent .......... unusual transactions, spikes, data problems
@@ -24,6 +24,8 @@ Supervisor agent (Gemini) ── decides which specialists to ask
                 ▼
 Supervisor writes a short answer and picks charts ──► React website shows them
 ```
+
+Full details and every formula are in `explanation.txt` (local file, not committed).
 
 **The golden rule:** the AI never calculates or types numbers. It only chooses which calculation to run.
 Python does the maths, so the numbers are always correct.
@@ -96,7 +98,8 @@ Then open **http://localhost:5173**. Edits to `frontend/src` show up immediately
 | Change the example questions | `frontend/src/components/Chat.jsx` (`EXAMPLE_QUESTIONS`) |
 | Change the sidebar | `frontend/src/components/Sidebar.jsx` |
 | Change how a chart looks | `frontend/src/components/ChartView.jsx` |
-| Change what the AI agents are told | `backend/agent/agent.py` (the `..._PROMPT` texts) |
+| Change what the AI agents are told | `backend/agent/prompts.py` |
+| Change the agent flow (LangGraph) | `backend/agent/graph.py` |
 | Add a new calculation | `backend/analytics/engine.py`, then register it in `backend/agent/tools.py` |
 | Change how a calculation becomes a chart | `backend/analytics/charts.py` |
 | Change how the raw data is cleaned | `backend/data/loader.py` |
@@ -113,7 +116,9 @@ AssetV/
 │   │   ├── charts.py     turns results into chart descriptions
 │   │   └── periods.py    understands "last_6_months", "FY2025-26", ...
 │   └── agent/
-│       ├── agent.py      the supervisor + 3 specialist agents (Gemini)
+│       ├── graph.py      LangGraph: plan → specialists (parallel) → answer
+│       ├── prompts.py    all AI instructions + the 3 specialists
+│       ├── gemini.py     small Gemini helpers + token counter
 │       └── tools.py      the list of functions the AI is allowed to call
 └── frontend/             React website
     └── src/
@@ -127,7 +132,7 @@ AssetV/
 
 1. Write a function in `backend/analytics/engine.py` that returns a dict of numbers.
 2. Describe it in `backend/agent/tools.py` with `_tool("my_function", "what it does", {...params})`.
-3. Add its name to one specialist's `"tools"` list in `backend/agent/agent.py`.
+3. Add its name to one specialist's `"tools"` list in `backend/agent/prompts.py`.
 4. (Optional) Add a chart for it in `backend/analytics/charts.py`.
 
 The AI picks up the new function on the next restart.
@@ -139,8 +144,8 @@ The AI picks up the new function on the next restart.
 Every answer shows a line such as *"Used 4,900 AI tokens in 5 model calls"*. These choices keep that
 number small:
 
-- **Few model calls:** the supervisor makes 2 calls per question (plan, then answer), and each specialist
-  makes exactly 1.
+- **Few model calls:** the LangGraph flow is fixed: 1 plan call, 1 call per specialist (run in parallel),
+  and 1 answer call.
 - **Charts cost no extra calls:** the supervisor writes `[[chart r3 line]]` in its answer, and the server
   draws the chart from data it already has.
 - **Compact data:** results are sent to the AI as compact tables, about half the size of plain JSON.

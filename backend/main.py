@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from fastapi import FastAPI  # noqa: E402
-from fastapi.responses import FileResponse, StreamingResponse  # noqa: E402
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
@@ -78,9 +78,17 @@ def healthcheck():
     return {"ok": True, "llm": llm_available()}
 
 
-app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
+# Serve the built React app (created by `npm run build` in frontend/) from the same server,
+# so after building you only need to run this one Python server.
+DIST = FRONTEND / "dist"
+if (DIST / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
 
 
 @app.get("/")
 def index():
-    return FileResponse(FRONTEND / "index.html")
+    if (DIST / "index.html").exists():
+        return FileResponse(DIST / "index.html")
+    return HTMLResponse("<h3>Frontend not built yet.</h3><p>Run <code>npm install</code> and "
+                        "<code>npm run build</code> inside the <code>frontend</code> folder, then refresh. "
+                        "(Or use <code>npm run dev</code> and open http://localhost:5173.)</p>")

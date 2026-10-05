@@ -1,6 +1,6 @@
 """Multi-agent orchestration on Gemini: a Supervisor delegates to specialist agents.
 
-                       Supervisor Agent  (conversation, planning, charts, final answer)
+                       Supervisor Agent  (conversation, planning, final answer + chart picks)
                               │  delegate_to_* function calls (run in parallel)
           ┌───────────────────┼────────────────────┐
    Financial Agent      Anomaly Agent       Recommendation Agent
@@ -8,10 +8,14 @@
    assets, debt, NW,    duplicates/quality, what-if scenarios
    forecast             trends
 
-Each specialist runs its own Gemini function-calling loop over a scoped tool
-subset of the deterministic analytics engine. All agents share one ToolContext,
-so the supervisor can chart any result a specialist produced (by result_id)
-without numbers ever passing through the LLM.
+Token budget per user turn (the key key-saving design choices):
+  * supervisor: 2 calls — plan/delegate, then answer. Charts are requested inline in
+    the answer as [[chart r3 line]] markers, so there is no extra render round trip;
+  * specialists: 1 call each — a forced function call (thinking off) picks the tools;
+    their compact results go straight back to the supervisor without a summary call;
+  * tool declarations and results are compacted (see tools.py);
+  * conversation history is trimmed to the last few exchanges.
+Numbers still never pass through the LLM for charts: markers reference cached results.
 
 `run_turn` yields UI events:
   {"type": "agent", "agent", "status": "start"|"done", "task"?}
@@ -19,6 +23,7 @@ without numbers ever passing through the LLM.
   {"type": "tool_result", "agent", "name", "ok", "summary"}
   {"type": "chart", "spec"}
   {"type": "text", "text"}
+  {"type": "usage", "calls", "input_tokens", "output_tokens", "total_tokens"}
   {"type": "error", "message"}
   {"type": "done", "mode"}
 """
@@ -27,6 +32,7 @@ from __future__ import annotations
 import json
 import os
 import queue
+import re
 import threading
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -35,16 +41,21 @@ from dataclasses import dataclass, field
 from google import genai
 from google.genai import errors, types
 
-from backend.agent.tools import TOOLS, ToolContext, run_tool
+from backend.agent.tools import CATEGORIES, TOOLS, ToolContext, run_tool
 
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 WORKER_MODEL = os.getenv("GEMINI_WORKER_MODEL", MODEL)
-MAX_STEPS = 8
+# Thinking tokens are billed as output; keep them small. Only applied to 2.5-series models.
+SUPERVISOR_THINKING = int(os.getenv("GEMINI_SUPERVISOR_THINKING_BUDGET", "512"))
+WORKER_THINKING = int(os.getenv("GEMINI_WORKER_THINKING_BUDGET", "0"))
+MAX_STEPS = 4                 # supervisor model calls per user turn
+HISTORY_TURNS = int(os.getenv("GEMINI_HISTORY_TURNS", "4"))  # past user exchanges kept in context
 
-DATA_CONTEXT = """Data: 24 months of household transactions (Oct 2024 – Sep 2026, INR), 8 assets and 3 liabilities \
-as of 01-Oct-2026. "Now" is early October 2026; "last month" means Sep 2026. Raw data had intentional defects \
-(duplicates, missing fields, a malformed date, extreme outliers) that were cleaned or quarantined before analysis. \
-"Spending" excludes investments and loan repayments; investments count as savings."""
+DATA_CONTEXT = ("Household finances, INR. Transactions Oct 2024-Sep 2026 (cleaned; bad rows quarantined); "
+                "8 assets, 3 loans as of 01-Oct-2026. Now = Oct 2026, last month = Sep 2026. "
+                "'Spending' excludes investments and EMIs.")
+PERIODS = ("Periods: all, last_N_months, latest_month, previous_month, ytd, YYYY, FY2025-26 (Apr-Mar), "
+           "Q1-2026, YYYY-MM, YYYY-MM:YYYY-MM.")
 
 TOOL_BY_NAME = {t["name"]: t for t in TOOLS}
 
@@ -54,63 +65,36 @@ SPECIALISTS = {
         "tools": ["get_financial_summary", "get_cashflow", "get_spending_breakdown", "compare_periods",
                   "get_category_trend", "get_spending_heatmap", "get_assets", "get_liabilities", "get_net_worth",
                   "forecast", "search_transactions"],
-        "brief": "cash flow, income, spending breakdowns, period comparisons, category trends, assets, "
-                 "liabilities/debt, net worth, forecasts, transaction lookups",
+        "brief": "cash flow, spending, period comparisons, trends, assets, debt, net worth, forecast, transactions",
     },
     "anomaly": {
         "label": "Anomaly Agent",
         "tools": ["detect_anomalies", "get_data_quality_report", "search_transactions", "get_category_trend",
                   "compare_periods"],
-        "brief": "unusual transactions/outliers, category spikes, duplicates and data-quality issues, "
-                 "missed or irregular payments, what changed and why",
+        "brief": "outliers, spending spikes, duplicates/data quality, missed payments, what changed",
     },
     "recommendation": {
         "label": "Recommendation Agent",
         "tools": ["get_health_score", "get_recommendations", "simulate_scenario", "get_financial_summary",
                   "get_liabilities"],
-        "brief": "0-100 health score and its drivers, prioritised actions with ₹ impact, what-if scenarios",
+        "brief": "health score, prioritised actions, what-if scenarios",
     },
 }
 
-SPECIALIST_PROMPT = """You are the {label}, a specialist inside a financial-analysis team. The supervisor gives you \
-a task; investigate it with your tools and report findings back to the supervisor (not to the end user).
+SPECIALIST_PROMPT = ("You are the {label}. Call the tool(s) that answer the task, applying its periods/filters "
+                     "as arguments. Call several tools at once if needed. {data} {periods} Categories: {cats}.")
 
-{data}
+SUPERVISOR_PROMPT = """You are Vantage, supervisor of financial-analysis agents for one Indian household. {data}
 
-Rules:
-- Every number must come from a tool result; do not do your own arithmetic beyond trivial differences.
-- Apply any filters, periods or exclusions stated in the task as tool arguments. Call independent tools together.
-- Be efficient: usually 1-3 tool calls are enough.
-- Reply with a compact findings brief: key numbers, drivers, caveats. No preamble, no charts (the supervisor \
-renders charts from your results)."""
-
-SUPERVISOR_PROMPT = """You are Vantage, the supervisor of a team of financial-analysis agents serving one Indian \
-household. You talk to the user; your specialists do the analysis.
-
-{data}
-
-Your team (delegate with the matching function; tasks must be self-contained — include periods, filters, \
-exclusions and any context from earlier in the conversation, because specialists do not see the chat):
+Agents (tasks must be self-contained: include periods, filters and context from earlier turns):
 {team}
 
-How to work:
-- Plan first: split the user's question into specialist tasks. Delegate independent tasks together in one turn \
-(several delegate calls at once). Simple follow-ups may need only one specialist.
-- Each delegate result lists `results` (result_id, tool, chartable_as). Show, don't just tell: call render_chart \
-for each visual that helps (usually 1-3). If the user names a chart type, use exactly that type when it's allowed \
-for the source tool; otherwise say which types are possible. Do not chart trivially simple answers.
-- Explicit instructions are filters ("exclude property", "only above ₹1 lakh", "2025 vs 2026") — pass them on.
-- Follow-ups ("why?", "exclude one-time expenses", "show that monthly") refer to the previous answer. \
-"One-time" spending means excluding anomalies and usually Travel.
-- Never invent numbers; use only what specialists reported.
-
-Answer style:
-- Lead with the direct answer in one sentence, then 2-4 short bullets of supporting facts or drivers.
-- Indian formatting: ₹ with lakh/crore where natural (₹36.87 L, ₹68,000).
-- Mention data-quality caveats only when they affect the answer.
-- Advice must be concrete and quantified. You are not a licensed advisor; say so briefly only when asked for \
-specific investment products.
-- Keep it tight: the charts carry the detail."""
+1. Delegate: call the agent(s) needed, in parallel when independent.
+2. Answer from their results only — never invent numbers. Lead with a one-sentence answer, then 2-4 short bullets. \
+Use ₹ with lakh/crore (₹36.9 L). Be brief.
+3. Charts: add one line per chart, [[chart <result_id> <type>]], choosing a type from that result's "charts" list \
+(first = default). Use the user's requested type when allowed. Usually 1-2 charts; none for trivial answers.
+Follow-ups refer to the previous answer. "One-time" spending = exclude anomalies and Travel."""
 
 
 def _declaration(tool: dict) -> types.FunctionDeclaration:
@@ -120,35 +104,37 @@ def _declaration(tool: dict) -> types.FunctionDeclaration:
     return types.FunctionDeclaration(name=tool["name"], description=tool["description"], parameters_json_schema=schema)
 
 
-def _delegate_tool(key: str, spec: dict) -> dict:
-    return {
-        "name": f"delegate_to_{key}_agent",
-        "description": f"Ask the {spec['label']} to investigate a task. Specialises in: {spec['brief']}.",
-        "input_schema": {"type": "object", "properties": {
-            "task": {"type": "string", "description": "Self-contained task with periods, filters and what to find out"}},
-            "required": ["task"]},
-    }
+def _thinking(model: str, budget: int) -> types.ThinkingConfig | None:
+    return types.ThinkingConfig(thinking_budget=budget) if "2.5" in model else None
 
 
-def _config(system: str, tool_dicts: list[dict]) -> types.GenerateContentConfig:
+def _config(system: str, tool_dicts: list[dict], model: str, budget: int, force_call: bool = False):
     return types.GenerateContentConfig(
         system_instruction=system,
         tools=[types.Tool(function_declarations=[_declaration(t) for t in tool_dicts])],
-        # we run the loop ourselves so every call is logged and streamed to the UI
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+        tool_config=types.ToolConfig(function_calling_config=types.FunctionCallingConfig(mode="ANY")) if force_call else None,
+        thinking_config=_thinking(model, budget),
     )
 
 
+DELEGATE_TOOLS = [{
+    "name": f"delegate_to_{k}_agent",
+    "description": f"{v['label']}: {v['brief']}.",
+    "input_schema": {"type": "object", "properties": {"task": {"type": "string"}}, "required": ["task"]},
+} for k, v in SPECIALISTS.items()]
+
 SUPERVISOR_CONFIG = _config(
-    SUPERVISOR_PROMPT.format(
-        data=DATA_CONTEXT,
-        team="\n".join(f"- {v['label']} (delegate_to_{k}_agent): {v['brief']}" for k, v in SPECIALISTS.items())),
-    [_delegate_tool(k, v) for k, v in SPECIALISTS.items()] + [TOOL_BY_NAME["render_chart"]],
-)
+    SUPERVISOR_PROMPT.format(data=DATA_CONTEXT, team="\n".join(
+        f"- delegate_to_{k}_agent: {v['brief']}" for k, v in SPECIALISTS.items())),
+    DELEGATE_TOOLS, MODEL, SUPERVISOR_THINKING)
 SPECIALIST_CONFIGS = {
-    k: _config(SPECIALIST_PROMPT.format(label=v["label"], data=DATA_CONTEXT), [TOOL_BY_NAME[n] for n in v["tools"]])
+    k: _config(SPECIALIST_PROMPT.format(label=v["label"], data=DATA_CONTEXT, periods=PERIODS, cats=", ".join(CATEGORIES)),
+               [TOOL_BY_NAME[n] for n in v["tools"]], WORKER_MODEL, WORKER_THINKING, force_call=True)
     for k, v in SPECIALISTS.items()
 }
+
+CHART_MARKER = re.compile(r"\[\[\s*chart\s+(r\d+)(?:\s+([a-z_]+))?\s*\]\]", re.I)
 
 
 @dataclass
@@ -177,22 +163,31 @@ def llm_available() -> bool:
     return bool(api_key())
 
 
-def _summarize(content: str) -> str:
-    try:
-        d = json.loads(content)
-        data = d.get("data", d)
-        keys = list(data)[:4] if isinstance(data, dict) else []
-        return f"{d.get('result_id', '')} · {', '.join(keys)}"
-    except (json.JSONDecodeError, AttributeError):
-        return content[:160]
-
-
 class TurnBlocked(Exception):
     pass
 
 
-def _generate(client: genai.Client, model: str, config, history: list[types.Content]) -> types.Content:
+class Usage:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.calls = self.input = self.output = 0
+
+    def add(self, meta):
+        if not meta:
+            return
+        with self.lock:
+            self.calls += 1
+            self.input += meta.prompt_token_count or 0
+            self.output += (meta.candidates_token_count or 0) + (meta.thoughts_token_count or 0)
+
+    def event(self):
+        return {"type": "usage", "calls": self.calls, "input_tokens": self.input, "output_tokens": self.output,
+                "total_tokens": self.input + self.output}
+
+
+def _generate(client, model, config, history, usage: Usage) -> types.Content:
     resp = client.models.generate_content(model=model, contents=history, config=config)
+    usage.add(resp.usage_metadata)
     if not resp.candidates or resp.candidates[0].content is None:
         reason = getattr(resp.prompt_feedback, "block_reason", None) or (
             resp.candidates[0].finish_reason if resp.candidates else "no candidates")
@@ -220,86 +215,81 @@ def _response_part(call: types.FunctionCall, content: str, is_error: bool) -> ty
 
 
 # ---------------------------------------------------------------- specialists
-def run_specialist(client: genai.Client, key: str, task: str, ctx: ToolContext, emit) -> str:
+def run_specialist(client, key: str, task: str, ctx: ToolContext, emit, usage: Usage) -> str:
+    """One forced function call; tool results go straight back to the supervisor (no summary call)."""
     spec = SPECIALISTS[key]
     label = spec["label"]
-    history = [types.Content(role="user", parts=[types.Part(text=task)])]
-    produced: list[dict] = []
-    findings = ""
     emit({"type": "agent", "agent": label, "status": "start", "task": task})
+    results, note = [], None
     try:
-        for _ in range(MAX_STEPS):
-            content = _generate(client, WORKER_MODEL, SPECIALIST_CONFIGS[key], history)
-            history.append(content)
-            if text := _texts(content):
-                findings = text
-            calls = _calls(content)
-            if not calls:
-                break
-            parts = []
-            for call in calls:
-                args = dict(call.args or {})
-                emit({"type": "tool_call", "agent": label, "name": call.name, "input": args})
-                if call.name not in spec["tools"]:
-                    result, is_error = f"Tool {call.name} is not available to {label}", True
-                else:
-                    result, _, is_error = run_tool(ctx, call.name, args)
-                emit({"type": "tool_result", "agent": label, "name": call.name, "ok": not is_error,
-                      "summary": result[:200] if is_error else _summarize(result)})
-                if not is_error:
-                    d = json.loads(result)
-                    produced.append({"result_id": d["result_id"], "tool": call.name, "args": args,
-                                     "chartable_as": d["chartable_as"], "default_chart": d["default_chart"]})
-                parts.append(_response_part(call, result, is_error))
-            history.append(types.Content(role="user", parts=parts))
+        content = _generate(client, WORKER_MODEL, SPECIALIST_CONFIGS[key],
+                            [types.Content(role="user", parts=[types.Part(text=task)])], usage)
+        for call in _calls(content):
+            args = dict(call.args or {})
+            emit({"type": "tool_call", "agent": label, "name": call.name, "input": args})
+            if call.name not in spec["tools"]:
+                out, is_error = f"Tool {call.name} is not available to {label}", True
+            else:
+                out, _, is_error = run_tool(ctx, call.name, args)
+            emit({"type": "tool_result", "agent": label, "name": call.name, "ok": not is_error,
+                  "summary": out[:160] if is_error else json.loads(out)["result_id"]})
+            results.append({"tool": call.name, "args": args, **({"error": out} if is_error else json.loads(out))})
+        if not results:
+            note = _texts(content) or "No tool selected."
     except TurnBlocked as e:
-        findings = findings or str(e)
+        note = str(e)
     emit({"type": "agent", "agent": label, "status": "done"})
-    return json.dumps({"agent": label, "findings": findings or "(no findings)", "results": produced}, ensure_ascii=False)
+    return json.dumps({"agent": label, "results": results, **({"note": note} if note else {})},
+                      ensure_ascii=False, separators=(",", ":"))
 
 
 # ---------------------------------------------------------------- supervisor
-def _supervise(session: Session, user_text: str, emit):
+def _trimmed(messages: list[types.Content]) -> list[types.Content]:
+    """Last HISTORY_TURNS exchanges, cut at a plain user message so function call/response pairs stay intact."""
+    starts = [i for i, c in enumerate(messages) if c.role == "user" and any(p.text for p in c.parts)]
+    return messages[starts[-HISTORY_TURNS]:] if len(starts) > HISTORY_TURNS else messages
+
+
+def _emit_answer(text: str, ctx: ToolContext, emit):
+    for rid, chart_type in CHART_MARKER.findall(text):
+        _, spec, err = run_tool(ctx, "render_chart", {"result_id": rid, "chart_type": (chart_type or "").lower() or None})
+        if err:  # type not allowed for this result -> its default chart
+            _, spec, err = run_tool(ctx, "render_chart", {"result_id": rid})
+        if spec:
+            emit({"type": "chart", "spec": spec})
+    clean = re.sub(r"\n{3,}", "\n\n", CHART_MARKER.sub("", text)).strip()
+    if clean:
+        emit({"type": "text", "text": clean})
+
+
+def _supervise(session: Session, user_text: str, emit, usage: Usage):
     client = genai.Client(api_key=api_key())
     session.messages.append(types.Content(role="user", parts=[types.Part(text=user_text)]))
     for _ in range(MAX_STEPS):
-        content = _generate(client, MODEL, SUPERVISOR_CONFIG, session.messages)
+        content = _generate(client, MODEL, SUPERVISOR_CONFIG, _trimmed(session.messages), usage)
         session.messages.append(content)  # kept intact: Gemini needs its thought signatures back
-        if text := _texts(content):
-            emit({"type": "text", "text": text})
         calls = _calls(content)
         if not calls:
+            _emit_answer(_texts(content), session.ctx, emit)
             return
+        if text := _texts(content):
+            emit({"type": "text", "text": CHART_MARKER.sub("", text).strip()})
 
         def handle(call: types.FunctionCall) -> tuple[str, bool]:
-            args = dict(call.args or {})
-            if call.name.startswith("delegate_to_"):
-                key = call.name.removeprefix("delegate_to_").removesuffix("_agent")
-                if key not in SPECIALISTS:
-                    return f"Unknown agent {key}", True
-                return run_specialist(client, key, args.get("task", ""), session.ctx, emit), False
-            result, spec, is_error = run_tool(session.ctx, call.name, args)
-            if spec:
-                emit({"type": "chart", "spec": spec})
-            elif is_error:
-                emit({"type": "tool_result", "agent": "Supervisor", "name": call.name, "ok": False, "summary": result[:200]})
-            return result, is_error
+            key = call.name.removeprefix("delegate_to_").removesuffix("_agent")
+            if key not in SPECIALISTS:
+                return f"Unknown function {call.name}", True
+            return run_specialist(client, key, dict(call.args or {}).get("task", ""), session.ctx, emit, usage), False
 
-        # delegations run in parallel; charts run afterwards, in order
-        delegations = [i for i, c in enumerate(calls) if c.name.startswith("delegate_to_")]
-        outcomes: dict[int, tuple[str, bool]] = {}
-        with ThreadPoolExecutor(max_workers=max(1, len(delegations))) as pool:
-            futures = {i: pool.submit(handle, calls[i]) for i in delegations}
-            for i, fut in futures.items():
+        outcomes: list[tuple[str, bool]] = []
+        with ThreadPoolExecutor(max_workers=len(calls)) as pool:
+            for fut in [pool.submit(handle, c) for c in calls]:
                 try:
-                    outcomes[i] = fut.result()
+                    outcomes.append(fut.result())
                 except errors.APIError as e:
-                    outcomes[i] = (f"Specialist failed: {e.message}", True)
-        for i, call in enumerate(calls):
-            if i not in outcomes:
-                outcomes[i] = handle(call)
+                    outcomes.append((f"Specialist failed: {e.message}", True))
         session.messages.append(types.Content(
-            role="user", parts=[_response_part(c, *outcomes[i]) for i, c in enumerate(calls)]))
+            role="user", parts=[_response_part(c, *o) for c, o in zip(calls, outcomes)]))
     emit({"type": "text", "text": "_(stopped after too many steps)_"})
 
 
@@ -310,10 +300,11 @@ def run_turn(session: Session, user_text: str):
         return
 
     q: queue.Queue = queue.Queue()
+    usage = Usage()
 
     def worker():
         try:
-            _supervise(session, user_text, q.put)
+            _supervise(session, user_text, q.put, usage)
         except TurnBlocked as e:
             q.put({"type": "error", "message": str(e)})
         except errors.ClientError as e:
@@ -331,6 +322,7 @@ def run_turn(session: Session, user_text: str):
     while (event := q.get()) is not None:
         yield event
     _repair_history(session)
+    yield usage.event()
     yield {"type": "done", "mode": "llm", "model": MODEL}
 
 

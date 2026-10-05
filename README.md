@@ -42,6 +42,14 @@ You need **Python 3.10+** and **Node.js 18+** installed.
 pip install -r requirements.txt
 ```
 
+> **PDF reports need one extra system install.** WeasyPrint (the PDF engine) uses the Pango library:
+> - **Windows:** install the GTK3 runtime from
+>   https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases, then restart the terminal.
+> - **macOS:** `brew install pango`
+> - **Ubuntu/Debian:** `sudo apt install libpango-1.0-0 libpangoft2-1.0-0`
+>
+> Without it the app still runs, and Excel reports still work. Only **Download PDF** fails.
+
 **2. Add your Gemini API key.** Copy `.env.example` to a new file called `.env`, then put your key after
 `GEMINI_API_KEY=` (no quotes, no spaces). Get a key at https://aistudio.google.com/apikey.
 
@@ -103,18 +111,29 @@ Then open **http://localhost:5173**. Edits to `frontend/src` show up immediately
 | Add a new calculation | `backend/analytics/engine.py`, then register it in `backend/agent/tools.py` |
 | Change how a calculation becomes a chart | `backend/analytics/charts.py` |
 | Change how the raw data is cleaned | `backend/data/loader.py` |
+| Add, remove or reorder report sections | `backend/reports/definitions.py` (`REPORTS`) |
+| Change what a report section contains | `backend/reports/blocks.py` |
+| Change how a report section looks (PDF) | `backend/templates/reports/blocks/<section>.html` |
+| Change the Excel workbook | `backend/reports/xlsx.py` |
+| Change the Download report panel | `frontend/src/components/ReportPanel.jsx` |
 
 ```
 AssetV/
 ├── .env                  your API key (you create this)
 ├── dataset/              the 3 CSV files
 ├── backend/              Python
-│   ├── main.py           web server: /api/chat, /api/overview, /api/rechart
+│   ├── main.py           web server: /api/chat, /api/overview, /api/rechart, /api/report
 │   ├── data/loader.py    reads + cleans the CSVs
 │   ├── analytics/
 │   │   ├── engine.py     all the financial maths (16 functions)
 │   │   ├── charts.py     turns results into chart descriptions
 │   │   └── periods.py    understands "last_6_months", "FY2025-26", ...
+│   ├── reports/          downloadable reports
+│   │   ├── definitions.py  each report = ordered list of sections + input checks
+│   │   ├── blocks.py       one function per section, returns plain data
+│   │   ├── pdf.py          Jinja2 + WeasyPrint (+ matplotlib chart)
+│   │   └── xlsx.py         Excel workbook with live formulas
+│   ├── templates/reports/  one HTML template per report section
 │   └── agent/
 │       ├── graph.py      LangGraph: plan → specialists (parallel) → answer
 │       ├── prompts.py    all AI instructions + the 3 specialists
@@ -125,7 +144,7 @@ AssetV/
         ├── App.jsx       page layout
         ├── api.js        talks to the Python server
         ├── format.js     ₹ formatting + colours
-        └── components/   Sidebar, Chat, Message, ChartCard, ChartView
+        └── components/   Sidebar, Chat, Message, ChartCard, ChartView, ReportPanel
 ```
 
 ### Adding a new question type (example)
@@ -138,6 +157,22 @@ AssetV/
 The AI picks up the new function on the next restart.
 
 ---
+
+## Downloadable reports
+
+Click **Download report** in the chat header. No AI is involved: every figure comes from `engine.py`.
+
+| Report | Formats | Period |
+|---|---|---|
+| **Tax / CA pack** — income by source (salary, bonuses, consulting), items for CA review (80D, home loan, ELSS, tuition, rent), expenses, assets & liabilities, data-quality note, disclaimer | PDF + Excel | Financial year (default FY 2025-26; 2024-25 and 2026-27 are partial) |
+| **Monthly review** — verdict, month in numbers, what changed vs previous 3 months (chart), top 5 expenses, payments due in 10 days, 3 recommendations, data note | PDF (max 2 pages) | Month (default: last complete month) |
+
+API: `GET /api/report?type=ca_pack|monthly&fy=2025-26|month=2026-09&format=pdf|xlsx&name=…&pan=…&hide_details=true`
+
+- **Hide transaction details** removes row-level tables, for sharing outside the family. Totals stay.
+- **PAN** is optional, printed on the CA pack cover only, and never stored or logged.
+- Bad inputs (e.g. a month outside the data) return a 400 with a clear message.
+- The Excel Summary sheet uses live formulas over the other sheets, so edits recalculate.
 
 ## Keeping AI costs low
 

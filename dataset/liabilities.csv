@@ -1,0 +1,4 @@
+liability_id,type,outstanding,interest_rate,emi,due_date
+L001,Home Loan,2850000,8.35,28500,2026-10-10
+L002,Car Loan,420000,9.1,11200,2026-10-07
+L003,Credit Card,68000,32.0,7000,2026-10-05

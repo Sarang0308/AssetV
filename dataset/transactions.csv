@@ -1,0 +1,818 @@
+txn_id,date,category,description,amount,type
+T0001,2024-10-02,Salary,Monthly salary,205000,income
+T0002,2024-10-05,Other Income,Consulting income,18000,income
+T0003,2024-10-03,Housing,Rent / Home Maintenance,32000,expense
+T0004,2024-10-07,Debt Payment,Home loan EMI,28500,expense
+T0005,2024-10-08,Debt Payment,Car loan EMI,11200,expense
+T0006,2024-10-10,Insurance,Health insurance,5500,expense
+T0007,2024-10-12,Utilities,Electricity,3200,expense
+T0008,2024-10-13,Utilities,Internet,1200,expense
+T0009,2024-10-14,Utilities,Mobile,900,expense
+T0010,2024-10-15,Investments,Mutual fund SIP,20000,expense
+T0011,2024-10-16,Investments,Equity investment,15000,expense
+T0012,2024-10-04,Food,Groceries,1917.55,expense
+T0013,2024-10-07,Food,Dining out,2950.99,expense
+T0014,2024-10-10,Food,Supermarket,5261.41,expense
+T0015,2024-10-13,Food,Groceries,4575.31,expense
+T0016,2024-10-16,Food,Groceries,1940.05,expense
+T0017,2024-10-04,Transport,Cab,1281.65,expense
+T0018,2024-10-07,Transport,Fuel,2103.11,expense
+T0019,2024-10-10,Transport,Car maintenance,1251.1,expense
+T0020,2024-10-04,Shopping,Online shopping,3663.88,expense
+T0021,2024-10-07,Shopping,Clothing,6884.01,expense
+T0022,2024-10-04,Entertainment,Movies,2684.98,expense
+T0023,2024-10-07,Entertainment,Streaming,1550.25,expense
+T0024,2024-10-04,Healthcare,Pharmacy,5786.07,expense
+T0025,2024-10-04,Personal Care,Gym,914.64,expense
+T0026,2024-10-04,Other,Bank charges,886.87,expense
+T0027,2024-10-04,Education,Books,4216.77,expense
+T0028,2024-11-02,Salary,Monthly salary,206500,income
+T0029,2024-11-05,Other Income,Consulting income,20500,income
+T0030,2024-11-03,Housing,Rent / Home Maintenance,32000,expense
+T0031,2024-11-07,Debt Payment,Home loan EMI,28500,expense
+T0031,2024-11-08,Debt Payment,Car loan EMI,11200,expense
+T0033,2024-11-10,Insurance,Health insurance,5500,expense
+T0034,2024-11-12,Utilities,Electricity,3450,expense
+T0035,2024-11-13,Utilities,Internet,1200,expense
+T0036,2024-11-14,Utilities,Mobile,900,expense
+T0037,2024-11-15,Investments,Mutual fund SIP,20000,expense
+T0038,2024-11-16,Investments,Equity investment,10000,expense
+T0039,2024-11-11,Food,Groceries,5229.74,expense
+T0040,2024-11-14,Food,Groceries,6373.64,expense
+T0041,2024-11-17,Food,Food delivery,2170.36,expense
+T0042,2024-11-20,Food,Dining out,5698.2,expense
+T0043,2024-11-23,Food,Dining out,4513.56,expense
+T0044,2024-11-11,Transport,Fuel,814.56,expense
+T0045,2024-11-14,Transport,Cab,2632.67,expense
+T0046,2024-11-17,Transport,Fuel,2838.29,expense
+T0047,2024-11-11,Shopping,Clothing,4346.85,expense
+T0048,2024-11-14,Shopping,Electronics,6059.09,expense
+T0049,2024-11-11,Entertainment,Streaming,1239.17,expense
+T0050,2024-11-14,Entertainment,Streaming,1365.67,expense
+T0051,2024-11-11,Healthcare,Doctor consultation,4509.1,expense
+T0052,2024-11-11,Personal Care,Personal care,2060.87,expense
+T0053,2024-11-11,Other,Gifts,3039.91,expense
+T0054,2024-11-11,Education,Training,4781.07,expense
+T0055,2024-11-22,Debt Payment,Credit card payment,5980.41,expense
+T0056,2024-12-02,Salary,Monthly salary,208000,income
+T0057,2024-12-05,Other Income,Consulting income,23000,income
+T0058,2024-12-03,Housing,Rent / Home Maintenance,32000,expense
+T0059,2024-12-07,Debt Payment,Home loan EMI,28500,expense
+T0060,2024-12-08,Debt Payment,Car loan EMI,11200,expense
+T0061,2024-12-10,Insurance,Health insurance,5500,expense
+T0062,2024-12-12,Utilities,Electricity,3700,expense
+T0063,2024-12-13,Utilities,Internet,1200,expense
+T0064,2024-12-14,Utilities,Mobile,900,expense
+T0065,2024-12-15,Investments,Mutual fund SIP,20000,expense
+T0066,2024-12-16,Investments,Equity investment,10000,expense
+T0067,2024-12-18,Food,Food delivery,3068.75,expense
+T0068,2024-12-21,Food,Supermarket,5017.69,expense
+T0069,2024-12-24,Food,Groceries,2876.53,expense
+T0070,2024-12-27,Food,Groceries,5583.72,expense
+T0071,2024-12-06,Food,Food delivery,3058.38,expense
+T0072,2024-12-18,Transport,Cab,2982.84,expense
+T0073,2024-12-21,Transport,Metro,1231.57,expense
+T0074,2024-12-24,Transport,Car maintenance,1689.08,expense
+T0075,2024-12-18,Shopping,Online shopping,4874.31,expense
+T0076,2024-12-21,Shopping,Electronics,2735.52,expense
+T0077,2024-12-18,Entertainment,Weekend outing,2315.69,expense
+T0078,2024-12-21,Entertainment,Streaming,2816.94,expense
+T0079,2024-12-18,Healthcare,Doctor consultation,5489.11,expense
+T0080,2024-12-18,Personal Care,Gym,1460.19,expense
+T0081,2024-12-18,Other,Miscellaneous,2538.11,expense
+T0082,2024-12-18,Education,Course fee,4901.02,expense
+T0083,2024-12-20,Travel,Flight / Hotel booking,38666.47,expense
+T0084,2024-12-22,Debt Payment,Credit card payment,5917.05,expense
+T0085,2025-01-02,Salary,Monthly salary,209500,income
+T0086,2025-01-05,Other Income,Consulting income,25500,income
+T0087,2025-01-03,Housing,Rent / Home Maintenance,32000,expense
+T0088,2025-01-07,Debt Payment,Home loan EMI,28500,expense
+T0089,2025-01-08,Debt Payment,Car loan EMI,-4500,expense
+T0090,2025-01-10,Insurance,Health insurance,5500,expense
+T0091,2025-01-12,Utilities,Electricity,3950,expense
+T0092,2025-01-13,Utilities,Internet,1200,expense
+T0093,2025-01-14,Utilities,Mobile,900,expense
+T0094,2025-01-15,Investments,Mutual fund SIP,20000,expense
+T0095,2025-01-16,Investments,Equity investment,15000,expense
+T0096,2025-01-25,Food,Supermarket,5522.77,expense
+T0097,2025-01-04,Food,Food delivery,4603.12,expense
+T0098,2025-01-07,Food,Food delivery,3593.61,expense
+T0099,2025-01-10,Food,Food delivery,4286.84,expense
+T0100,2025-01-13,Food,Groceries,4997.33,expense
+T0101,2025-01-25,Transport,Fuel,2404.28,expense
+T0102,2025-01-04,Transport,Metro,2621.5,expense
+T0103,2025-01-07,Transport,Metro,978.88,expense
+T0104,2025-01-25,Shopping,Electronics,2859.66,expense
+T0105,2025-01-04,Shopping,Clothing,8190.57,expense
+T0106,2025-01-25,Entertainment,Weekend outing,1511.15,expense
+T0107,2025-01-04,Entertainment,Weekend outing,2857.3,expense
+T0108,2025-01-25,Healthcare,Health checkup,5563.14,expense
+T0109,2025-01-25,Personal Care,Personal care,1326.73,expense
+T0110,2025-01-25,Other,Gifts,2530.65,expense
+T0111,2025-01-25,Education,Course fee,2187.78,expense
+T0112,2025-01-22,Debt Payment,Credit card payment,9575.06,expense
+T0113,2025-02-02,Salary,Monthly salary,211000,income
+T0114,2025-02-05,Other Income,Consulting income,18000,income
+T0115,2025-02-03,Housing,Rent / Home Maintenance,32000,expense
+T0116,2025-02-07,Debt Payment,Home loan EMI,28500,expense
+T0117,2025-02-08,Debt Payment,Car loan EMI,11200,expense
+T0118,2025-02-10,Insurance,Health insurance,5500,expense
+T0119,2025-02-12,Utilities,Electricity,4200,expense
+T0120,2025-02-13,Utilities,Internet,1200,expense
+T0121,2025-02-14,Utilities,Mobile,900,expense
+T0122,2025-02-15,Investments,Mutual fund SIP,20000,expense
+T0123,2025-02-16,Investments,Equity investment,10000,expense
+T0124,2025-02-08,Food,Groceries,4615.04,expense
+T0125,2025-02-11,Food,Food delivery,1891.54,expense
+T0126,2025-02-14,Food,Dining out,5929.99,expense
+T0127,2025-02-17,Food,Dining out,2925.43,expense
+T0128,2025-02-20,Food,Supermarket,5926.65,expense
+T0129,2025-02-08,Transport,Fuel,914.13,expense
+T0130,2025-02-11,Transport,Car maintenance,2740.06,expense
+T0131,2025-02-14,Transport,Cab,1020.98,expense
+T0132,2025-02-08,Shopping,Electronics,8143.89,expense
+T0133,2025-02-11,Shopping,Clothing,3575.88,expense
+T0134,2025-02-08,Entertainment,Weekend outing,1942.47,expense
+T0135,2025-02-11,Entertainment,Movies,3308.07,expense
+T0136,2025-02-08,Healthcare,Health checkup,4449.34,expense
+T0137,2025-02-08,Personal Care,Personal care,1354.6,expense
+T0138,2025-02-08,Other,,3099.51,expense
+T0139,2025-02-08,Education,Books,5548.26,expense
+T0140,2025-02-22,Debt Payment,Credit card payment,7708.92,expense
+T0141,2025-03-02,Salary,Monthly salary,302500,income
+T0142,2025-03-05,Other Income,Consulting income,20500,income
+T0143,2025-03-03,Housing,Rent / Home Maintenance,32000,expense
+T0144,2025-03-07,Debt Payment,Home loan EMI,28500,expense
+T0145,2025-03-08,Debt Payment,Car loan EMI,11200,expense
+T0146,2025-03-10,Insurance,Health insurance,5500,expense
+T0147,2025-03-12,Utilities,Electricity,3200,expense
+T0148,2025-03-13,Utilities,Internet,1200,expense
+T0149,2025-03-14,Utilities,Mobile,900,expense
+T0150,2025-03-15,Investments,Mutual fund SIP,20000,expense
+T0151,2025-03-16,Investments,Equity investment,10000,expense
+T0152,2025-03-15,Food,Supermarket,2856.08,expense
+T0153,2025-03-18,Food,Dining out,1898.86,expense
+T0154,2025-03-21,Food,Supermarket,4565.67,expense
+T0155,2025-03-24,Food,Groceries,2133.67,expense
+T0156,2025-03-27,Food,Groceries,2876.03,expense
+T0157,2025-03-15,Transport,Fuel,2849.09,expense
+T0158,2025-03-18,Transport,Fuel,1985.39,expense
+T0159,2025-03-21,Transport,Metro,2372.44,expense
+T0160,2025-03-15,Shopping,Clothing,5412.87,expense
+T0161,2025-03-18,Shopping,Online shopping,8067.95,expense
+T0162,2025-03-15,Entertainment,Weekend outing,2355.77,expense
+T0163,2025-03-18,Entertainment,Movies,2918.47,expense
+T0164,2025-03-15,Healthcare,Doctor consultation,1952.05,expense
+T0165,2025-03-15,Personal Care,Salon,2083.86,expense
+T0166,2025-03-15,Other,Bank charges,2194.31,expense
+T0167,2025-03-15,Education,Books,5387.27,expense
+T0168,2025-03-22,Debt Payment,Credit card payment,5325.03,expense
+T0169,2025-04-02,Salary,Monthly salary,214000,income
+T0170,2025-04-05,Other Income,Consulting income,23000,income
+T0171,2025-04-03,Housing,Rent / Home Maintenance,32000,expense
+T0172,2025-04-07,Debt Payment,Home loan EMI,28500,expense
+T0173,2025-04-08,Debt Payment,Car loan EMI,11200,expense
+T0174,2025-04-10,Insurance,Health insurance,5500,expense
+T0175,2025-04-12,Utilities,Electricity,3450,expense
+T0176,2025-04-13,Utilities,Internet,1200,expense
+T0177,2025-04-14,Utilities,Mobile,900,expense
+T0178,2025-04-15,Investments,Mutual fund SIP,20000,expense
+T0179,2025-04-16,Investments,Equity investment,15000,expense
+T0180,2025-04-22,Food,Groceries,2084.88,expense
+T0181,2025-04-25,Food,Dining out,5562.78,expense
+T0182,2025-04-04,Food,Groceries,2968.68,expense
+T0183,2025-04-07,Food,Supermarket,4320.54,expense
+T0184,2025-04-10,Food,Supermarket,3782.84,expense
+T0185,2025-04-22,Transport,Metro,1856.57,expense
+T0186,2025-04-25,Transport,Fuel,1807.83,expense
+T0187,2025-04-04,Transport,Fuel,826.47,expense
+T0188,2025-04-22,Shopping,Online shopping,7401.38,expense
+T0189,2025-04-25,Shopping,Clothing,8006.66,expense
+T0190,2025-04-22,Entertainment,Movies,1249.04,expense
+T0191,2025-04-25,Entertainment,Streaming,2099.67,expense
+T0192,2025-04-22,Healthcare,Doctor consultation,5512.21,expense
+T0193,2025-04-22,Personal Care,Salon,1495.84,expense
+T0194,2025-04-22,Other,Bank charges,1560.81,expense
+T0195,2025-04-22,Education,Books,2783.62,expense
+T0196,2025-04-20,Travel,Flight / Hotel booking,34718.2,expense
+T0197,2025-04-22,Debt Payment,Credit card payment,9383.03,expense
+T0198,2025-05-02,Salary,Monthly salary,215500,income
+T0199,2025-05-05,Other Income,Consulting income,25500,income
+T0200,2025-05-03,Housing,Rent / Home Maintenance,32000,expense
+T0201,2025-05-07,Debt Payment,Home loan EMI,28500,expense
+T0202,2025-05-08,Foods,Car loan EMI,11200,expense
+T0203,2025-05-10,Insurance,Health insurance,5500,expense
+T0204,2025-05-12,Utilities,Electricity,3700,expense
+T0205,2025-05-13,Utilities,Internet,1200,expense
+T0206,2025-05-14,Utilities,Mobile,900,expense
+T0207,2025-05-15,Investments,Mutual fund SIP,20000,expense
+T0208,2025-05-16,Investments,Equity investment,10000,expense
+T0209,2025-05-05,Food,Food delivery,2527.55,expense
+T0210,2025-05-08,Food,Dining out,2823.19,expense
+T0211,2025-05-11,Food,Groceries,4522.15,expense
+T0212,2025-05-14,Food,Groceries,5315.49,expense
+T0213,2025-05-17,Food,Groceries,2035.67,expense
+T0214,2025-05-05,Transport,Car maintenance,1957.13,expense
+T0215,2025-05-08,Transport,Cab,842.2,expense
+T0216,2025-05-11,Transport,Fuel,2828.36,expense
+T0217,2025-05-05,Shopping,Clothing,5786.74,expense
+T0218,2025-05-08,Shopping,Online shopping,7574.19,expense
+T0219,2025-05-05,Entertainment,Streaming,1123.69,expense
+T0220,2025-05-08,Entertainment,Weekend outing,1464.78,expense
+T0221,2025-05-05,Healthcare,Health checkup,1198.71,expense
+T0222,2025-05-05,Personal Care,Salon,1580.37,expense
+T0223,2025-05-05,Other,Gifts,2760.91,expense
+T0224,2025-05-05,Education,Books,5706.18,expense
+T0225,2025-05-22,Debt Payment,Credit card payment,6225.56,expense
+T0226,2025-06-02,Salary,Monthly salary,217000,income
+T0227,2025-06-05,Other Income,Consulting income,18000,income
+T0228,2025-06-03,Housing,Rent / Home Maintenance,32000,expense
+T0229,2025-06-07,Debt Payment,Home loan EMI,28500,expense
+T0230,2025-06-08,Debt Payment,Car loan EMI,11200,expense
+T0231,2025-06-10,Insurance,Health insurance,5500,expense
+T0232,2025-06-12,Utilities,Electricity,3950,expense
+T0233,2025-06-13,Utilities,Internet,1200,expense
+T0234,2025-06-14,Utilities,Mobile,900,expense
+T0235,2025-06-15,Investments,Mutual fund SIP,20000,expense
+T0236,2025-06-16,Investments,Equity investment,10000,expense
+T0237,2025-06-12,Food,Dining out,2921.82,expense
+T0238,2025-06-15,Food,Food delivery,2415.13,expense
+T0239,2025-06-18,Food,Dining out,3948.96,expense
+T0240,2025-06-21,Food,Groceries,1843.78,expense
+T0241,2025-06-24,Food,Groceries,2144.33,expense
+T0242,2025-06-12,Transport,Cab,1964.71,expense
+T0243,2025-06-15,Transport,Cab,3033.15,expense
+T0244,2025-06-18,Transport,Fuel,2898.18,expense
+T0245,2025-06-12,Shopping,Electronics,3709.42,expense
+T0246,2025-06-15,Shopping,Electronics,7386.09,expense
+T0247,2025-06-12,Entertainment,Weekend outing,1616.8,expense
+T0248,2025-06-15,Entertainment,Weekend outing,2228.14,expense
+T0249,2025-06-12,Healthcare,Health checkup,5085.52,expense
+T0250,2025-06-12,Personal Care,Gym,2656.69,expense
+T0251,2025-06-12,Other,Miscellaneous,4255.72,expense
+T0252,2025-06-12,Education,Course fee,2690.1,expense
+T0253,2025-06-22,Debt Payment,Credit card payment,10338.28,expense
+T0254,2025-07-02,Salary,Monthly salary,218500,income
+T0255,2025-07-05,Other Income,Consulting income,20500,income
+T0256,2025-07-03,Housing,Rent / Home Maintenance,32000,expense
+T0257,2025-07-07,Debt Payment,Home loan EMI,28500,expense
+T0258,2025-07-08,Debt Payment,Car loan EMI,11200,expense
+T0259,2025-07-10,Insurance,Health insurance,5500,expense
+T0260,2025-07-12,Utilities,Electricity,4200,expense
+T0261,2025-07-13,Utilities,Internet,1200,expense
+T0262,2025-07-14,Utilities,Mobile,900,expense
+T0263,2025-07-15,Investments,Mutual fund SIP,20000,expense
+T0264,2025-07-16,Investments,Equity investment,15000,expense
+T0265,2025-07-19,Food,Supermarket,3080.04,expense
+T0266,2025-07-22,Food,Supermarket,5172.78,expense
+T0267,2025-07-25,Food,Supermarket,5031.24,expense
+T0268,2025-07-04,Food,Dining out,4175.42,expense
+T0269,2025-07-07,Food,Dining out,6055.08,expense
+T0270,2025-07-19,Transport,Fuel,930.75,expense
+T0271,2025-07-22,Transport,Car maintenance,2773.37,expense
+T0272,2025-07-25,Transport,Fuel,708.86,expense
+T0273,2025-07-19,Shopping,Clothing,6068.66,expense
+T0274,2025-07-22,Shopping,Electronics,2882.6,expense
+T0275,2025-07-19,Entertainment,Streaming,2289.54,expense
+T0276,2025-07-22,Entertainment,Streaming,2314.45,expense
+T0277,2026-11-15,Healthcare,Pharmacy,1376.22,expense
+T0278,2025-07-19,Personal Care,Personal care,2598.25,expense
+T0279,2025-07-19,Other,Gifts,644.11,expense
+T0280,2025-07-19,Education,Books,4121.29,expense
+T0281,2025-07-20,Travel,Flight / Hotel booking,21554.25,expense
+T0282,2025-07-22,Debt Payment,Credit card payment,5764.67,expense
+T0283,2025-08-02,Salary,Monthly salary,220000,income
+T0284,2025-08-05,Other Income,Consulting income,23000,income
+T0285,2025-08-03,Housing,Rent / Home Maintenance,32000,expense
+T0286,2025-08-07,Debt Payment,Home loan EMI,28500,expense
+T0287,2025-08-08,Debt Payment,Car loan EMI,11200,expense
+T0288,2025-08-10,Insurance,Health insurance,5500,expense
+T0289,2025-08-12,Utilities,Electricity,3200,expense
+T0290,2025-08-13,Utilities,Internet,1200,expense
+T0291,2025-08-14,Utilities,Mobile,900,expense
+T0292,2025-08-15,Investments,Mutual fund SIP,20000,expense
+T0293,2025-08-16,Investments,Equity investment,10000,expense
+T0294,2025-08-26,Food,Dining out,3513.86,expense
+T0295,2025-08-05,Food,Groceries,6024.95,expense
+T0296,2025-08-08,Food,Supermarket,5005.71,expense
+T0297,2025-08-11,Food,Groceries,3462.29,expense
+T0298,2025-08-14,Food,Food delivery,6377.03,expense
+T0299,2025-08-26,Transport,Cab,3014.41,expense
+T0300,2025-08-05,Transport,Cab,2861.51,expense
+T0301,2025-08-08,Transport,Cab,2903.54,expense
+T0302,2025-08-26,Shopping,Clothing,3001.72,expense
+T0303,2025-08-05,Shopping,Electronics,7041.99,expense
+T0304,2025-08-26,Entertainment,Streaming,2966.03,expense
+T0305,2025-08-05,Entertainment,Weekend outing,2989.02,expense
+T0306,2025-08-26,Healthcare,Doctor consultation,1795.99,expense
+T0307,2025-08-26,Personal Care,Personal care,927.0,expense
+T0308,2025-08-26,Other,Miscellaneous,3934.37,expense
+T0309,2025-08-26,Education,Course fee,2398.08,expense
+T0310,2025-08-22,Debt Payment,Credit card payment,10510.71,expense
+T0311,2025-09-02,Salary,Monthly salary,311500,income
+T0312,2025-09-05,Other Income,Consulting income,25500,income
+T0313,2025-09-03,Housing,Rent / Home Maintenance,32000,expense
+T0314,2025-09-07,Debt Payment,Home loan EMI,28500,expense
+T0315,2025-09-08,Debt Payment,Car loan EMI,11200,expense
+T0316,2025-09-10,Insurance,Health insurance,5500,expense
+T0317,2025-09-12,Utilities,Electricity,3450,expense
+T0318,2025-09-13,Utilities,Internet,1200,expense
+T0319,2025-09-14,Utilities,Mobile,900,expense
+T0320,2025-09-15,Investments,Mutual fund SIP,20000,expense
+T0321,2025-09-16,Investments,Equity investment,10000,expense
+T0322,2025-09-09,Food,Dining out,3234.4,expense
+T0323,2025-09-12,Food,Supermarket,2847.74,expense
+T0324,2025-09-15,Food,Supermarket,3672.79,expense
+T0325,2025-09-18,Food,Dining out,5862.46,expense
+T0326,2025-09-21,Food,Dining out,3450.39,expense
+T0327,2025-09-09,Transport,Car maintenance,2398.8,expense
+T0328,2025-09-12,Transport,Metro,3048.09,expense
+T0329,2025-09-15,Transport,Fuel,2892.6,expense
+T0330,2025-09-09,Shopping,Electronics,2996.4,expense
+T0331,2025-09-12,Shopping,Electronics,2056.32,expense
+T0332,2025-09-09,Entertainment,Weekend outing,1973.32,expense
+T0333,2025-09-12,Entertainment,Weekend outing,2923.36,expense
+T0334,2025-09-09,Healthcare,Doctor consultation,4031.04,expense
+T0335,2025-09-09,Personal Care,Personal care,942.86,expense
+T0336,2025-09-09,Other,Gifts,1260.32,expense
+T0337,2025-09-09,Education,Course fee,4689.53,expense
+T0338,2025-09-22,Debt Payment,Credit card payment,5010.15,expense
+T0339,2025-10-02,Salary,Monthly salary,223000,income
+T0340,2025-10-05,Other Income,Consulting income,18000,income
+T0341,2025-10-03,Housing,Rent / Home Maintenance,32000,expense
+T0342,2025-10-07,Debt Payment,Home loan EMI,28500,expense
+T0343,2025-10-08,Debt Payment,Car loan EMI,0,expense
+T0344,2025-10-10,Insurance,Health insurance,5500,expense
+T0345,2025-10-12,Utilities,Electricity,3700,expense
+T0346,2025-10-13,Utilities,Internet,1200,expense
+T0347,2025-10-14,Utilities,Mobile,900,expense
+T0348,2025-10-15,Investments,Mutual fund SIP,20000,expense
+T0349,2025-10-16,Investments,Equity investment,15000,expense
+T0350,2025-10-16,Food,Supermarket,3511.84,expense
+T0351,2025-10-19,Food,Groceries,6259.71,expense
+T0352,2025-10-22,Food,Dining out,4728.83,expense
+T0353,2025-10-25,Food,Groceries,5182.85,expense
+T0354,2025-10-04,Food,Dining out,4183.48,expense
+T0355,2025-10-16,Transport,Car maintenance,1515.46,expense
+T0356,2025-10-19,Transport,Metro,2086.03,expense
+T0357,2025-10-22,Transport,Cab,1751.12,expense
+T0358,2025-10-16,Shopping,Electronics,6338.03,expense
+T0359,2025-10-19,Shopping,Clothing,5923.95,expense
+T0360,2025-10-16,Entertainment,Streaming,1896.4,expense
+T0361,2025-10-19,Entertainment,Movies,1620.46,expense
+T0362,2025-10-16,Healthcare,Pharmacy,3149.44,expense
+T0363,2025-10-16,Personal Care,Personal care,1973.99,expense
+T0364,2025-10-16,Other,Bank charges,2359.95,expense
+T0365,2025-10-16,Education,Books,4540.32,expense
+T0366,2025-10-22,Debt Payment,Credit card payment,8067.04,expense
+T0367,2025-11-02,Salary,Monthly salary,224500,income
+T0368,2025-11-05,Other Income,Consulting income,20500,income
+T0369,2025-11-03,Housing,Rent / Home Maintenance,32000,expense
+T0370,2025-11-07,Debt Payment,Home loan EMI,28500,expense
+T0371,2025-11-08,Debt Payment,Car loan EMI,11200,expense
+T0372,2025-11-10,Insurance,Health insurance,5500,expense
+T0373,2025-11-12,Utilities,Electricity,3950,expense
+T0374,2025-11-13,Utilities,Internet,1200,expense
+T0375,2025-11-14,Utilities,Mobile,900,expense
+T0376,2025-11-15,Investments,Mutual fund SIP,20000,expense
+T0377,2025-11-16,Investments,Equity investment,10000,expense
+T0378,2025-11-23,Food,Supermarket,5067.98,expense
+T0379,2025-11-26,Food,Dining out,4370.42,expense
+T0380,2025-11-05,Food,Dining out,2317.28,expense
+T0381,2025-11-08,Food,Supermarket,5135.81,expense
+T0382,2025-11-11,Food,Supermarket,5786.53,expense
+T0383,2025-11-23,Transport,Cab,787.7,expense
+T0384,2025-11-26,Transport,Cab,3270.43,expense
+T0385,2025-11-05,Transport,Fuel,1902.89,expense
+T0386,2025-11-23,Shopping,Online shopping,5854.99,expense
+T0387,2025-11-26,Shopping,Online shopping,6691.87,expense
+T0388,2025-11-23,Entertainment,Streaming,1944.83,expense
+T0389,2025-11-26,Entertainment,Movies,2661.35,expense
+T0390,2025-11-23,Healthcare,Pharmacy,5654.51,expense
+T0391,2025-11-23,Personal Care,Salon,2416.4,expense
+T0392,2025-11-23,Other,Miscellaneous,1245.67,expense
+T0393,2025-11-23,Education,Training,3964.89,expense
+T0394,2025-11-22,Debt Payment,Credit card payment,5301.31,expense
+T0395,2025-12-02,Salary,Monthly salary,226000,income
+T0396,2025-12-05,Other Income,Consulting income,23000,income
+T0397,2025-12-03,Housing,Rent / Home Maintenance,32000,expense
+T0398,2025-12-07,Debt Payment,Home loan EMI,28500,expense
+T0399,2025-12-08,Debt Payment,Car loan EMI,11200,expense
+T0400,2025-12-10,Insurance,Health insurance,5500,expense
+T0401,2025-12-12,Utilities,Electricity,4200,expense
+T0402,2025-12-13,Utilities,Internet,1200,expense
+T0403,2025-12-14,Utilities,Mobile,900,expense
+T0404,2025-12-15,Investments,Mutual fund SIP,20000,expense
+T0405,2025-12-16,Investments,Equity investment,10000,expense
+T0406,2025-12-06,Food,Supermarket,6539.96,expense
+T0407,2025-12-09,Food,Groceries,4221.55,expense
+T0408,2025-12-12,Food,Food delivery,5283.25,expense
+T0409,2025-12-15,Food,Dining out,6703.75,expense
+T0410,2025-12-18,Food,Food delivery,5007.03,expense
+T0410,2025-12-18,Food,Food delivery,5007.03,expense
+T0412,2025-12-09,Transport,Car maintenance,3149.03,expense
+T0413,2025-12-12,Transport,Car maintenance,1952.94,expense
+T0414,2025-12-06,Shopping,Clothing,7946.98,expense
+T0415,2025-12-09,Shopping,Electronics,7416.12,expense
+T0416,2025-12-06,Entertainment,Weekend outing,2256.0,expense
+T0417,2025-12-09,Entertainment,Movies,1649.31,expense
+T0418,2025-12-06,Healthcare,Pharmacy,4887.47,expense
+T0419,2025-12-06,Personal Care,Salon,1359.54,expense
+T0420,2025-12-06,Other,Bank charges,4357.15,expense
+T0421,2025-12-06,Education,Course fee,2271.27,expense
+T0422,2025-12-20,Travel,Flight / Hotel booking,23550.28,expense
+T0423,2025-12-22,Debt Payment,Credit card payment,9163.7,expense
+T0424,2026-01-02,Salary,Monthly salary,227500,income
+T0425,2026-01-05,Other Income,Consulting income,25500,income
+T0426,2026-01-03,Housing,Rent / Home Maintenance,32000,expense
+T0427,2026-01-07,Debt Payment,Home loan EMI,28500,expense
+T0428,2026-01-08,Debt Payment,Car loan EMI,11200,expense
+T0429,2026-01-10,Insurance,Health insurance,5500,expense
+T0430,2026-01-12,Utilities,Electricity,3200,expense
+T0431,2026-01-13,Utilities,Internet,1200,expense
+T0432,2026-01-14,Utilities,Mobile,900,expense
+T0433,2026-01-15,Investments,Mutual fund SIP,20000,expense
+T0434,2026-01-16,Investments,Equity investment,15000,expense
+T0435,2026-01-13,Food,Supermarket,2322.57,expense
+T0436,2026-01-16,Food,Food delivery,3707.43,expense
+T0437,2026-01-19,Food,Food delivery,4148.32,expense
+T0438,2026-01-22,Food,Supermarket,6314.62,expense
+T0439,2026-01-25,Food,Food delivery,6688.28,expense
+T0440,2026-01-13,Transport,Fuel,3140.22,expense
+T0441,2026-01-16,Transport,Car maintenance,2091.16,expense
+T0442,2026-01-19,Transport,Metro,1598.42,expense
+T0443,2026-01-13,Shopping,Electronics,8307.5,expense
+T0444,2026-01-16,Shopping,Electronics,5973.72,expense
+T0445,2026-01-13,Entertainment,Weekend outing,2513.39,expense
+T0446,2026-01-16,Entertainment,Weekend outing,3562.62,expense
+T0447,2026-01-13,Healthcare,Doctor consultation,2317.3,expense
+T0448,2026-01-13,Personal Care,Gym,1900.43,expense
+T0449,2026-01-13,Other,Bank charges,2038.19,expense
+T0450,2026-01-13,Education,Training,5626.26,expense
+T0451,2026-01-22,Debt Payment,Credit card payment,9345.09,expense
+T0452,2026-02-02,Salary,Monthly salary,229000,income
+T0453,2026-02-05,Other Income,Consulting income,18000,income
+T0454,2026-02-03,Housing,Rent / Home Maintenance,32000,expense
+T0455,2026-02-07,Debt Payment,Home loan EMI,28500,expense
+T0456,2026-02-08,Debt Payment,Car loan EMI,11200,expense
+T0457,2026-02-10,Insurance,Health insurance,5500,expense
+T0458,2026-02-12,Utilities,Electricity,3450,expense
+T0459,2026-02-13,Utilities,Internet,1200,expense
+T0460,2026-02-14,Utilities,Mobile,900,expense
+T0461,2026-02-15,Investments,Mutual fund SIP,20000,expense
+T0462,2026-02-16,Investments,Equity investment,10000,expense
+T0463,2026-02-20,Food,Food delivery,6978.9,expense
+T0464,2026-02-23,Food,Groceries,6911.32,expense
+T0465,2026-02-26,Food,Groceries,2501.79,expense
+T0466,2026-02-05,Food,Food delivery,2779.08,expense
+T0467,2026-02-08,Food,Food delivery,3025.7,expense
+T0468,2026-02-20,Transport,Metro,1878.45,expense
+T0469,2026-02-23,Transport,Cab,2093.89,expense
+T0470,2026-02-26,Transport,Metro,2967.5,expense
+T0471,2026-02-20,Shopping,Electronics,4177.32,expense
+T0472,2026-02-23,Shopping,Electronics,3978.85,expense
+T0473,2026-02-20,Entertainment,Movies,2359.6,expense
+T0474,2026-02-23,Entertainment,Weekend outing,2572.33,expense
+T0475,2026-02-20,Healthcare,Doctor consultation,2418.07,expense
+T0476,2026-02-20,Personal Care,Salon,2668.27,expense
+T0477,2026-02-20,Other,Gifts,753.58,expense
+T0478,2026-02-20,Education,Course fee,6581.51,expense
+T0479,2026-02-22,Debt Payment,Credit card payment,6196.16,expense
+T0480,2026-03-02,Salary,Monthly salary,320500,income
+T0481,2026-03-05,Other Income,Consulting income,20500,income
+T0482,2026-03-03,Housing,Rent / Home Maintenance,32000,expense
+T0483,2026-03-07,Debt Payment,Home loan EMI,28500,expense
+T0484,2026-03-08,Debt Payment,Car loan EMI,11200,expense
+T0485,2026-03-10,Insurance,Health insurance,5500,expense
+T0486,2026-03-12,Utilities,Electricity,3700,expense
+T0487,2026-03-13,Utilities,Internet,1200,expense
+T0488,2026-03-14,Utilities,Mobile,185000,expense
+T0489,2026-03-15,Investments,Mutual fund SIP,20000,expense
+T0490,2026-03-16,Investments,Equity investment,10000,expense
+T0491,2026-03-27,Food,Groceries,5546.33,expense
+T0492,2026-03-06,Food,Supermarket,2812.06,expense
+T0493,2026-03-09,Food,Groceries,5229.52,expense
+T0494,2026-03-12,Food,Supermarket,4683.15,expense
+T0495,2026-03-15,Food,Dining out,6350.19,expense
+T0496,2026-03-27,Transport,Cab,2602.31,expense
+T0497,2026-03-06,Transport,Fuel,3107.26,expense
+T0498,2026-03-09,Transport,Cab,3656.37,expense
+T0499,2026-03-27,Shopping,Clothing,6670.7,expense
+T0500,2026-03-06,Shopping,Electronics,6647.96,expense
+T0501,2026-03-27,Entertainment,Streaming,2198.39,expense
+T0502,2026-03-06,Entertainment,Weekend outing,1569.2,expense
+T0503,2026-03-27,Healthcare,Health checkup,5232.36,expense
+T0504,2026-03-27,Personal Care,Personal care,1421.73,expense
+T0505,2026-03-27,Other,Gifts,4218.16,expense
+T0506,2026-03-27,Education,Training,4937.18,expense
+T0507,2026-03-22,Debt Payment,Credit card payment,5726.33,expense
+T0508,2026-04-02,Salary,Monthly salary,232000,income
+T0509,2026-04-05,Other Income,Consulting income,23000,income
+T0510,2026-04-03,Housing,Rent / Home Maintenance,32000,expense
+T0511,2026-04-07,Debt Payment,Home loan EMI,28500,expense
+T0512,2026-04-08,Debt Payment,Car loan EMI,11200,expense
+T0513,2026-04-10,Insurance,Health insurance,5500,expense
+T0514,2026-04-12,Utilities,Electricity,3950,expense
+T0515,2026-04-13,Utilities,Internet,1200,expense
+T0516,2026-04-14,Utilities,Mobile,900,expense
+T0517,2026-04-15,Investments,Mutual fund SIP,20000,expense
+T0518,2026-04-16,Investments,Equity investment,15000,expense
+T0519,2026-04-10,Food,Groceries,4152.55,expense
+T0520,2026-04-13,Food,Food delivery,5940.07,expense
+T0521,2026-04-16,Food,Groceries,5055.4,expense
+T0522,2026-04-19,Food,Dining out,2249.95,expense
+T0523,2026-04-22,Food,Food delivery,6854.6,expense
+T0524,2026-04-10,Transport,Fuel,2158.41,expense
+T0525,2026-04-13,Transport,Metro,2769.64,expense
+T0526,2026-04-16,Transport,Car maintenance,2986.61,expense
+T0527,2026-04-10,Shopping,Electronics,5228.62,expense
+T0528,2026-04-13,Shopping,Online shopping,14507.39,expense
+T0529,2026-04-10,Entertainment,Streaming,2980.19,expense
+T0530,2026-04-13,Entertainment,Weekend outing,3498.75,expense
+T0531,2026-04-10,Healthcare,Doctor consultation,3845.23,expense
+T0532,2026-04-10,Personal Care,Personal care,2352.48,expense
+T0533,2026-04-10,Other,Bank charges,4727.29,expense
+T0534,2026-04-10,Education,Course fee,3333.76,expense
+T0535,2026-04-20,Travel,Flight / Hotel booking,28819.25,expense
+T0536,2026-04-22,Debt Payment,Credit card payment,9502.86,expense
+T0537,2026-05-02,Salary,Monthly salary,233500,income
+T0538,2026-05-05,Other Income,Consulting income,25500,income
+T0539,2026-05-03,Housing,Rent / Home Maintenance,32000,expense
+T0540,2026-05-07,Debt Payment,Home loan EMI,28500,expense
+T0541,2026-05-08,Debt Payment,Car loan EMI,11200,expense
+T0542,2026-05-10,Insurance,Health insurance,5500,expense
+T0543,2026-05-12,Utilities,Electricity,4200,expense
+T0544,2026-05-13,Utilities,Internet,1200,expense
+T0545,2026-05-14,Utilities,Mobile,900,expense
+T0546,2026-05-15,Investments,Mutual fund SIP,20000,expense
+T0547,2026-05-16,Investments,Equity investment,10000,expense
+T0548,2026-05-17,Food,Food delivery,4209.42,expense
+T0549,2026-05-20,Food,Food delivery,7220.35,expense
+T0550,2026-05-23,Food,Supermarket,5093.9,expense
+T0551,2026-05-26,Food,Dining out,6909.52,expense
+T0552,2026-05-05,Food,Dining out,3877.42,expense
+T0553,2026-05-17,Transport,Metro,2601.4,expense
+T0554,2026-05-20,Transport,Cab,1137.97,expense
+T0555,2026-05-23,Transport,Car maintenance,2392.2,expense
+T0556,2026-05-02,Salary,Monthly salary correction,205000,expense
+T0557,2026-05-20,Shopping,Online shopping,11859.31,expense
+T0558,2026-05-17,Entertainment,Streaming,3661.44,expense
+T0559,2026-05-20,Entertainment,Movies,1985.07,expense
+T0560,2026-05-17,Healthcare,Doctor consultation,5551.38,expense
+T0561,2026-05-17,Personal Care,Gym,2607.42,expense
+T0562,2026-05-17,Other,Bank charges,2979.34,expense
+T0563,2026-05-17,Education,Training,3793.4,expense
+T0564,2026-05-22,Debt Payment,Credit card payment,10979.79,expense
+T0565,2026-06-02,Salary,Monthly salary,235000,income
+T0566,2026-06-05,Other Income,Consulting income,18000,income
+T0567,2026-06-03,Housing,Rent / Home Maintenance,32000,expense
+T0568,2026-06-07,Debt Payment,Home loan EMI,28500,expense
+T0569,2026-06-08,Debt Payment,Car loan EMI,11200,expense
+T0570,2026-06-10,Insurance,Health insurance,5500,expense
+T0571,2026-06-12,Utilities,Electricity,3200,expense
+T0572,2026-06-13,Utilities,Internet,1200,expense
+T0573,2026-06-14,Utilities,Mobile,900,expense
+T0574,2026-06-15,Investments,Mutual fund SIP,20000,expense
+T0575,2026-06-16,Investments,Equity investment,10000,expense
+T0576,2026-06-24,Food,Dining out,5525.62,expense
+T0577,2026-06-27,Food,Food delivery,4917.29,expense
+T0578,2026-06-06,Food,Dining out,4613.65,expense
+T0579,2026-06-09,Food,Supermarket,5252.92,expense
+T0580,2026-06-12,Food,Supermarket,4320.39,expense
+T0581,2026-06-24,Transport,Car maintenance,1780.8,expense
+T0582,2026-06-27,Transport,Metro,4033.63,expense
+T0583,2026-06-06,Transport,Cab,1843.99,expense
+T0584,2026-06-24,Shopping,Electronics,5572.19,expense
+T0585,2026-06-27,Shopping,Clothing,12145.15,expense
+T0586,2026-06-24,Entertainment,Movies,1972.02,expense
+T0587,2026-06-27,Entertainment,Movies,2936.41,expense
+T0588,2026-06-24,Healthcare,Health checkup,7322.17,expense
+T0589,2026-06-24,Personal Care,Personal care,3230.42,expense
+T0590,2026-06-24,Other,Bank charges,1165.25,expense
+T0591,2026-06-24,Education,Course fee,5226.61,expense
+T0592,2026-06-22,Debt Payment,Credit card payment,7816.38,expense
+T0593,2026-07-02,Salary,Monthly salary,236500,income
+T0594,2026-07-05,Other Income,Consulting income,20500,income
+T0595,2026-07-03,Housing,Rent / Home Maintenance,32000,expense
+T0596,2026-07-07,Debt Payment,Home loan EMI,28500,expense
+T0597,2026-07-08,Debt Payment,Car loan EMI,11200,expense
+T0598,2026-07-10,Insurance,Health insurance,5500,expense
+T0599,2026-07-12,Utilities,Electricity,3450,expense
+T0600,2026-07-13,Utilities,Internet,1200,expense
+T0601,2026-07-14,Utilities,Mobile,900,expense
+T0602,2026-07-15,Investments,Mutual fund SIP,20000,expense
+T0603,2026-07-16,Investments,Equity investment,15000,expense
+T0604,2026-07-07,Food,Food delivery,5590.92,expense
+T0605,2026-07-10,Food,Groceries,4909.3,expense
+T0606,2026-07-13,Food,Food delivery,3840.14,expense
+T0607,2026-07-16,Food,Groceries,6054.47,expense
+T0608,2026-07-19,Food,Groceries,7416.6,expense
+T0609,2026-07-07,Transport,Fuel,1419.3,expense
+T0610,2026-07-10,Transport,Metro,1200.53,expense
+T0611,2026-07-13,Transport,Cab,1309.91,expense
+T0612,2026-07-07,Shopping,Electronics,11177.99,expense
+T0613,2026-07-10,Shopping,Online shopping,6315.35,expense
+T0614,2026-07-07,Entertainment,Weekend outing,2402.53,expense
+T0615,2026-07-10,Entertainment,Streaming,2107.75,expense
+T0616,2026-07-07,Healthcare,Health checkup,7824.46,expense
+T0617,2026-07-07,Personal Care,Gym,2490.77,expense
+T0618,2026-07-07,Other,Miscellaneous,3864.16,expense
+T0619,2026-07-07,Education,Training,2559.71,expense
+T0620,2026-07-20,Travel,Flight / Hotel booking,36305.69,expense
+T0621,2026-07-22,Debt Payment,Credit card payment,8753.09,expense
+T0622,2026-08-02,Salary,Monthly salary,238000,income
+T0623,2026-08-05,Other Income,Consulting income,23000,income
+T0624,2026-08-03,Housing,Rent / Home Maintenance,32000,expense
+T0625,2026-08-07,Debt Payment,Home loan EMI,28500,expense
+T0626,2026-08-08,Debt Payment,Car loan EMI,11200,expense
+T0627,2026-08-10,Insurance,Health insurance,5500,expense
+T0628,2026-08-12,Utilities,Electricity,3700,expense
+T0629,2026-08-13,Utilities,Internet,1200,expense
+T0630,2026-08-14,Utilities,Mobile,900,expense
+T0631,2026-08-15,Investments,Mutual fund SIP,20000,expense
+T0632,2026-08-16,Investments,Equity investment,10000,expense
+T0633,2026-08-14,Food,Dining out,8275.52,expense
+T0634,2026-08-17,Food,Supermarket,4939.93,expense
+T0635,2026-08-20,Food,Groceries,4279.0,expense
+T0636,2026-08-23,Food,Food delivery,6610.56,expense
+T0637,2026-08-26,Food,Food delivery,5347.55,expense
+T0638,2026-08-14,Transport,Cab,1917.35,expense
+T0639,2026-08-17,Transport,Metro,3317.58,expense
+T0640,2026-08-20,Transport,Car maintenance,1185.23,expense
+T0641,2026-08-14,Shopping,Clothing,15640.82,expense
+T0642,2026-08-17,Shopping,Online shopping,11258.74,expense
+T0643,2026/06/15,Entertainment,Movies,2629.63,expense
+T0644,2026-08-17,Entertainment,Weekend outing,1899.43,expense
+T0645,2026-08-14,Healthcare,Pharmacy,7481.78,expense
+T0646,2026-08-14,Personal Care,Salon,1147.45,expense
+T0647,2026-08-14,Other,Miscellaneous,4955.19,expense
+T0648,2026-08-14,Education,Training,6574.92,expense
+T0649,2026-08-22,Debt Payment,Credit card payment,8415.24,expense
+T0650,2026-09-02,Salary,Monthly salary,329500,income
+T0651,2026-09-05,Other Income,Consulting income,25500,income
+T0652,2026-09-03,Housing,Rent / Home Maintenance,32000,expense
+T0653,2026-09-07,Debt Payment,Home loan EMI,28500,expense
+T0654,2026-09-08,Debt Payment,Car loan EMI,11200,expense
+T0655,2026-09-10,Insurance,Health insurance,5500,expense
+T0656,2026-09-12,Utilities,Electricity,3950,expense
+T0657,2026-09-13,Utilities,Internet,1200,expense
+T0658,2026-09-14,Utilities,Mobile,900,expense
+T0659,2026-09-15,Investments,Mutual fund SIP,20000,expense
+T0660,2026-09-16,Investments,Equity investment,10000,expense
+T0661,2026-09-21,Food,Dining out,6689.59,expense
+T0662,2026-09-24,Food,Food delivery,8719.94,expense
+T0663,2026-09-27,Food,Food delivery,10786.69,expense
+T0664,2026-09-06,Food,Food delivery,6678.24,expense
+T0665,2026-09-09,Food,Groceries,10353.37,expense
+T0666,2026-09-21,Transport,Metro,3059.86,expense
+T0667,2026-09-24,Transport,Fuel,1285.72,expense
+T0668,2026-09-27,Transport,Fuel,4430.52,expense
+T0669,2026-09-21,Shopping,Online shopping,14667.3,expense
+T0670,2026-09-24,Shopping,Online shopping,4156.18,expense
+T0671,2026-09-21,Entertainment,Movies,2867.44,expense
+T0672,2026-09-24,Entertainment,Weekend outing,2761.72,expense
+T0673,2026-09-21,Healthcare,Doctor consultation,2641.81,expense
+T0674,2026-09-21,Personal Care,Personal care,2237.27,expense
+T0675,2026-09-21,Other,Bank charges,6061.07,expense
+T0676,2026-09-21,Education,Books,4246.17,expense
+T0677,2026-09-22,Debt Payment,Credit card payment,6999.85,expense
+T0678,2025-03-11,Food,Supermarket,926.63,expense
+T0679,2025-04-16,Entertainment,Streaming,1558.91,expense
+T0680,2025-05-21,Entertainment,Weekend outing,369.72,expense
+T0681,2025-06-26,Food,Dining out,779.56,expense
+T0682,2025-07-04,Food,Food delivery,1943.33,expense
+T0683,2025-08-09,Food,Food delivery,1085.17,expense
+T0684,2025-09-14,Transport,Metro,1483.0,expense
+T0685,2025-10-19,Entertainment,Weekend outing,1139.88,expense
+T0686,2025-11-24,Food,Supermarket,807.41,expense
+T0687,2025-12-02,Transport,Metro,1132.42,expense
+T0688,2026-01-07,Entertainment,Movies,354.85,expense
+T0689,2026-02-12,Transport,Cab,890.43,expense
+T0690,2026-03-17,Food,Food delivery,477.1,expense
+T0691,2026-04-22,Food,Food delivery,2099.42,expense
+T0692,2026-05-27,Transport,Car maintenance,2072.04,expense
+T0693,2026-06-05,Other,Gifts,1640.28,expense
+T0694,2026-07-10,Entertainment,Streaming,2162.46,expense
+T0695,2026-08-15,Transport,Car maintenance,1347.4,expense
+T0696,2026-09-20,Entertainment,Movies,2051.55,expense
+T0697,2024-10-25,Transport,Fuel,824.87,expense
+T0698,2024-11-03,Entertainment,Streaming,2075.07,expense
+T0699,2024-12-08,Other,Miscellaneous,837.39,expense
+T0700,2025-01-13,Other,Gifts,1401.85,expense
+T0701,2025-02-18,Entertainment,Movies,1148.44,expense
+T0702,2025-03-23,,Streaming,931.64,expense
+T0703,2025-04-01,Entertainment,Streaming,2072.42,expense
+T0704,2025-05-06,Transport,Cab,1386.42,expense
+T0705,2025-06-11,Transport,Car maintenance,382.93,expense
+T0706,2025-07-16,Entertainment,Weekend outing,2035.52,expense
+T0707,2025-08-21,Entertainment,Streaming,2177.99,expense
+T0708,2025-09-26,Transport,Car maintenance,2133.17,expense
+T0709,2025-10-04,Transport,Metro,1952.43,expense
+T0710,2025-11-09,Entertainment,Movies,1299.31,expense
+T0711,2025-12-14,Entertainment,Movies,1672.64,expense
+T0712,2026-01-19,Entertainment,Weekend outing,2142.92,expense
+T0713,2026-02-24,Food,Food delivery,1784.9,expense
+T0714,2026-03-02,Other,Bank charges,1484.19,expense
+T0715,2026-04-07,Entertainment,Weekend outing,452.6,expense
+T0716,2026-05-12,Other,Gifts,1932.75,expense
+T0717,2026-06-17,Entertainment,Streaming,1490.92,expense
+T0718,2026-07-22,Entertainment,Weekend outing,368.21,expense
+T0719,2026-08-27,Food,Supermarket,1499.21,expense
+T0720,2026-09-05,Other,Miscellaneous,1718.86,expense
+T0721,2024-10-10,Entertainment,Movies,1744.7,expense
+T0722,2024-11-15,Food,Food delivery,616.09,expense
+T0723,2024-12-20,Other,Miscellaneous,387.38,expense
+T0724,2025-01-25,Food,Dining out,981.08,expense
+T0725,2025-02-03,Entertainment,Movies,763.98,expense
+T0726,2025-03-08,Entertainment,Weekend outing,1595.42,expense
+T0727,2025-04-13,Transport,Cab,632.63,expense
+T0728,2025-05-18,Entertainment,Weekend outing,1597.96,expense
+T0729,2025-06-23,Entertainment,Weekend outing,571.92,expense
+T0730,2025-07-01,Entertainment,Weekend outing,782.56,expense
+T0731,2025-08-06,Other,Gifts,317.86,expense
+T0732,2025-09-11,Entertainment,Streaming,1587.46,expense
+T0733,2025-10-16,Transport,Fuel,1139.29,expense
+T0734,2025-11-21,Other,Gifts,868.39,expense
+T0735,2025-12-26,Entertainment,Weekend outing,775.19,expense
+T0736,2026-01-04,Other,Miscellaneous,2198.81,expense
+T0737,2026-02-09,Entertainment,Movies,750.69,expense
+T0738,2026-03-14,Other,Gifts,862.16,expense
+T0739,2026-04-19,Other,Miscellaneous,2158.09,expense
+T0740,2026-05-24,Entertainment,Streaming,315.39,expense
+T0741,2026-06-02,Food,Food delivery,1882.39,expense
+T0742,2026-07-07,Other,Miscellaneous,1453.42,expense
+T0743,2026-08-12,Other,Miscellaneous,1509.57,expense
+T0744,2026-09-17,Other,Gifts,1735.6,expense
+T0745,2024-10-22,Transport,Fuel,2016.47,expense
+T0746,2024-11-27,Food,Dining out,1798.36,expense
+T0747,2024-12-05,Food,Dining out,1691.48,expense
+T0748,2025-01-10,Food,Dining out,920.77,expense
+T0749,2025-02-15,Entertainment,Movies,681.51,expense
+T0750,2025-03-20,Other,Gifts,1253.41,expense
+T0751,2025-04-25,Other,Miscellaneous,788.24,expense
+T0752,2025-05-03,Entertainment,Streaming,1718.46,expense
+T0753,2025-06-08,Other,Miscellaneous,1189.83,expense
+T0754,2025-07-13,Food,Supermarket,1732.89,expense
+T0755,2025-08-18,Transport,Car maintenance,2137.81,expense
+T0756,2025-09-23,Other,Miscellaneous,1802.3,expense
+T0757,2025-10-01,Food,Dining out,1319.49,expense
+T0758,2025-11-06,Entertainment,Streaming,1578.37,expense
+T0759,2025-12-11,Other,Gifts,1023.95,expense
+T0760,2026-01-16,Other,Miscellaneous,1582.19,expense
+T0760,2026-02-21,Entertainment,Movies,1477.14,expense
+T0762,2026-03-26,Other,Gifts,720.6,expense
+T0763,2026-04-04,Food,Food delivery,2027.84,expense
+T0764,2026-05-09,Other,Gifts,1075.76,expense
+T0765,2026-06-14,Transport,Fuel,2097.9,expense
+T0766,2026-07-19,Other,Bank charges,520.63,expense
+T0767,2026-08-24,Transport,Cab,1038.43,expense
+T0768,2026-09-02,Other,Gifts,2103.82,expense
+T0769,2024-10-07,Entertainment,Weekend outing,1710.31,expense
+T0770,2024-11-12,Transport,Car maintenance,1544.35,expense
+T0771,2024-12-17,Entertainment,Weekend outing,1075.42,expense
+T0772,2025-01-22,Other,Miscellaneous,1611.53,expense
+T0773,2025-02-27,Transport,Car maintenance,1144.92,expense
+T0774,2025-03-05,Transport,Metro,488.77,expense
+T0775,2025-04-10,Other,Gifts,2013.22,expense
+T0776,2025-05-15,Other,Miscellaneous,1056.47,expense
+T0777,2025-06-20,Transport,Fuel,2103.12,expense
+T0778,2025-07-25,Entertainment,Movies,1559.26,expense
+T0779,2025-08-03,Food,Groceries,1794.91,expense
+T0780,2025-09-08,Transport,Cab,1795.26,expense
+T0781,2025-10-13,Transport,Fuel,1876.65,expense
+T0782,2025-11-18,Transport,Cab,1844.8,expense
+T0783,2025-12-23,Transport,Metro,1771.3,expense
+T0784,2026-01-01,Food,Dining out,1930.97,expense
+T0785,2026-02-06,Transport,Cab,1326.41,expense
+T0786,2026-03-11,Transport,Fuel,1556.01,expense
+T0787,2026-04-16,Food,Supermarket,328.23,expense
+T0788,2026-05-21,Transport,Metro,329.98,expense
+T0789,2026-06-26,Other,Miscellaneous,540.84,expense
+T0790,2026-07-04,Entertainment,Weekend outing,515.93,expense
+T0791,2026-08-09,Food,Food delivery,1151.72,expense
+T0792,2026-09-14,Other,Gifts,1427.97,expense
+T0793,2024-10-19,Entertainment,Weekend outing,720.94,expense
+T0794,2024-11-24,Food,Dining out,1170.28,expense
+T0795,2024-12-02,Food,Groceries,2197.31,expense
+T0796,2025-01-07,Entertainment,Streaming,1603.59,expense
+T0797,2025-02-12,Entertainment,Weekend outing,2028.43,expense
+T0798,2025-03-17,Food,Groceries,912.01,expense
+T0799,2025-04-22,Transport,Fuel,539.76,expense
+T0800,2025-05-27,Other,Bank charges,2189.79,expense
+T0801,2025-06-05,Other,Bank charges,1260.55,expense
+T0802,2025-07-10,Entertainment,Movies,1806.88,expense
+T0803,2025-08-15,Food,Supermarket,1117.13,expense
+T0804,2025-09-20,Transport,Car maintenance,943.97,expense
+T0805,2025-10-25,Entertainment,Streaming,1090.38,expense
+T0806,2025-11-03,Food,Dining out,1110.85,expense
+T0807,2025-12-08,Other,Bank charges,2111.83,expense
+T0808,2026-01-13,Entertainment,Movies,473.33,expense
+T0809,2026-02-18,Food,Groceries,1120.57,expense
+T0810,2026-03-23,Other,Miscellaneous,1357.1,expense
+T0811,2026-04-01,Other,Gifts,532.24,expense
+T0812,2026-05-06,Other,Gifts,2088.15,expense
+T0813,2026-06-11,Entertainment,Weekend outing,397.75,expense
+T0814,2026-07-16,Other,Gifts,893.65,expense
+T0815,2026-08-21,Food,Supermarket,593.99,expense
+T0816,2026-09-26,Entertainment,Movies,1909.82,expense
+T0817,2024-10-04,Other,Gifts,998.37,expense

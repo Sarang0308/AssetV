@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Vantage Analyst</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" id="rail">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">AV</div>
+        <div>
+          <div class="brand-name">Asset Vantage</div>
+          <div class="brand-sub">Financial analyst agent</div>
+        </div>
+        <button class="icon-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+      </div>
+
+      <section class="card" id="healthCard">
+        <h3>Financial health</h3>
+        <div class="gauge-wrap"><canvas id="railGauge" height="120"></canvas><div class="gauge-label" id="gaugeLabel"></div></div>
+        <ul class="breakdown" id="breakdown"></ul>
+      </section>
+
+      <section class="card">
+        <h3>Snapshot <span class="muted small" id="basis"></span></h3>
+        <div class="kpis" id="railKpis"></div>
+      </section>
+
+      <section class="card">
+        <h3>Upcoming dues</h3>
+        <ul class="dues" id="dues"></ul>
+      </section>
+
+      <section class="card quality" id="quality"></section>
+      <div class="mode" id="mode"></div>
+    </aside>
+
+    <main class="chat">
+      <header class="chat-head">
+        <div>
+          <h1>Ask about your money</h1>
+          <p class="muted">Every number is computed by the analytics engine; the agent plans the queries and explains the results.</p>
+        </div>
+        <button class="ghost" id="newChat">New chat</button>
+      </header>
+
+      <div class="thread" id="thread">
+        <div class="welcome" id="welcome">
+          <p class="muted">Try one of these, or ask anything:</p>
+          <div class="chips" id="chips"></div>
+        </div>
+      </div>
+
+      <form class="composer" id="composer">
+        <textarea id="input" rows="1" placeholder="e.g. Show my income vs expenses for the last 6 months and where I spend the most" autocomplete="off"></textarea>
+        <button type="submit" id="send" class="primary">Send</button>
+      </form>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

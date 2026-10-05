@@ -88,9 +88,21 @@ def render_html(report: Report) -> str:
 
 
 def render_pdf(report: Report) -> bytes:
-    from weasyprint import HTML  # imported lazily: needs system Pango libraries
+    try:
+        from weasyprint import HTML  # imported lazily: needs system Pango libraries
+    except (ImportError, OSError) as exc:
+        raise ReportLayoutError(
+            "PDF generation requires WeasyPrint with system GTK3/Pango libraries (libgobject-2.0-0). "
+            "On Windows, please download the report in Excel (.xlsx) format or install GTK3."
+        ) from exc
 
-    document = HTML(string=render_html(report), base_url=str(TEMPLATE_DIR)).render()
+    try:
+        document = HTML(string=render_html(report), base_url=str(TEMPLATE_DIR)).render()
+    except (ImportError, OSError) as exc:
+        raise ReportLayoutError(
+            f"WeasyPrint rendering failed: {exc}. Please use the Excel (.xlsx) export on Windows."
+        ) from exc
+
     limit = report.definition.max_pages
     if limit and len(document.pages) > limit:
         raise ReportLayoutError(f"{report.definition.title} rendered {len(document.pages)} pages (limit {limit}).")

@@ -18,7 +18,7 @@ from backend.agent.graph import MODEL, get_session, llm_available, run_turn  # n
 from backend.analytics import engine  # noqa: E402
 from backend.analytics.charts import build_chart  # noqa: E402
 from backend.reports.definitions import ReportInputError, build_report  # noqa: E402
-from backend.reports.pdf import render_pdf  # noqa: E402
+from backend.reports.pdf import ReportLayoutError, render_pdf  # noqa: E402
 from backend.reports.xlsx import render_xlsx  # noqa: E402
 
 MEDIA_TYPES = {"pdf": "application/pdf",
@@ -113,9 +113,11 @@ def report(
     pan = request.scope.get("state", {}).get("report_pan")
     try:
         report = build_report(report_type, fmt, fy=fy, month=month, name=name, pan=pan, hide_details=hide_details)
-    except ReportInputError as exc:
+        content = render_xlsx(report) if fmt == "xlsx" else render_pdf(report)
+    except (ReportInputError, ReportLayoutError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    content = render_xlsx(report) if fmt == "xlsx" else render_pdf(report)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Report rendering failed: {exc}") from exc
     return Response(content=content, media_type=MEDIA_TYPES[fmt],
                     headers={"Content-Disposition": f'attachment; filename="{report.filename_stem}.{fmt}"'})
 
